@@ -8,6 +8,7 @@ import (
 type MstCart struct {
 	utils.DefaultModel
 	UserID  uuid.UUID     `json:"user_id" gorm:"type:uuid;not null;uniqueIndex"`
+	UserRef *MstUsers     `gorm:"foreignKey:UserID"`
 	Items   []MstCartItem `gorm:"foreignKey:CartID"`
 }
 

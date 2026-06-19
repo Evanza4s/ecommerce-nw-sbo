@@ -10,8 +10,11 @@ type AddressResponse struct {
 	UserID       uuid.UUID  `json:"user_id"`
 	ReceiverName string     `json:"receiver_name"`
 	PhoneNumber  string     `json:"phone_number"`
+	ProvinceID   string     `json:"province_id"`
 	Province     string     `json:"province"`
+	CityID       string     `json:"city_id"`
 	City         string     `json:"city"`
+	DistrictID   string     `json:"district_id"`
 	District     string     `json:"district"`
 	Village      string     `json:"village,omitempty"`
 	PostalCode   string     `json:"postal_code"`

@@ -1,5 +1,6 @@
 "use client"
 import React from 'react'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { PriceSummary } from '@/components/ui/PriceSummary'
 
@@ -30,9 +31,11 @@ const CartSummary = ({ subtotal, shipping, discount, total }: CartSummaryProps) 
       total={format(total)}
       className="sticky top-24"
     >
-      <Button className='mt-6 w-full'>
-        Checkout
-      </Button>
+      <Link href="/checkout" className="mt-6 block w-full">
+        <Button className='w-full'>
+          Checkout
+        </Button>
+      </Link>
     </PriceSummary>
   )
 }

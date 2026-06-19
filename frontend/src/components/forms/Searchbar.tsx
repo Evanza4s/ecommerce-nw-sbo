@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
-import { Search } from "lucide-react"; 
+import { Search } from "lucide-react";
 
 type SearchbarProps = {
   className?: string;
@@ -20,8 +20,8 @@ const Searchbar = ({ className, placeholder = "Search Product..." }: SearchbarPr
   });
 
   const handleSearch = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); 
-    
+    e.preventDefault();
+
     if (query.trim()) {
       router.push(`/search?q=${encodeURIComponent(query)}`);
     }
@@ -44,8 +44,8 @@ const Searchbar = ({ className, placeholder = "Search Product..." }: SearchbarPr
         className="w-full bg-transparent border-none outline-none text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0"
       />
 
-      <button 
-        type="submit" 
+      <button
+        type="submit"
         className="relative flex h-8 w-8 items-center justify-center shrink-0 rounded-full transition-colors hover:bg-gray-100"
         aria-label="Submit search"
       >

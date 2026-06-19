@@ -17,8 +17,9 @@ interface AdminDetailPageProps {
   summaryTitle: string;
   summaryDescription: string;
   items: DetailItem[];
-  secondaryAction?: { label: string; href: string };
-  primaryAction?: { label: string; href: string };
+  secondaryAction?: { label: string; href?: string; onClick?: () => void; variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "danger" };
+  primaryAction?: { label: string; href?: string; onClick?: () => void; variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "danger" };
+  children?: ReactNode;
 }
 
 const AdminDetailPage = ({
@@ -30,6 +31,7 @@ const AdminDetailPage = ({
   items,
   secondaryAction,
   primaryAction,
+  children,
 }: AdminDetailPageProps) => {
   return (
     <AdminPageSection title={title} description={description}>
@@ -46,14 +48,32 @@ const AdminDetailPage = ({
 
           <div className="flex flex-wrap gap-3">
             {secondaryAction ? (
-              <Button asChild variant="outline">
-                <Link href={secondaryAction.href}>{secondaryAction.label}</Link>
-              </Button>
+              secondaryAction.href ? (
+                <Button asChild variant={secondaryAction.variant === "danger" ? "destructive" : (secondaryAction.variant || "outline")}>
+                  <Link href={secondaryAction.href}>{secondaryAction.label}</Link>
+                </Button>
+              ) : (
+                <Button 
+                  variant={secondaryAction.variant === "danger" ? "destructive" : (secondaryAction.variant || "outline")} 
+                  onClick={secondaryAction.onClick}
+                >
+                  {secondaryAction.label}
+                </Button>
+              )
             ) : null}
             {primaryAction ? (
-              <Button asChild>
-                <Link href={primaryAction.href}>{primaryAction.label}</Link>
-              </Button>
+              primaryAction.href ? (
+                <Button asChild variant={primaryAction.variant === "danger" ? "destructive" : (primaryAction.variant || "default")}>
+                  <Link href={primaryAction.href}>{primaryAction.label}</Link>
+                </Button>
+              ) : (
+                <Button 
+                  variant={primaryAction.variant === "danger" ? "destructive" : (primaryAction.variant || "default")} 
+                  onClick={primaryAction.onClick}
+                >
+                  {primaryAction.label}
+                </Button>
+              )
             ) : null}
           </div>
         </div>
@@ -66,6 +86,12 @@ const AdminDetailPage = ({
             </div>
           ))}
         </div>
+        
+        {children && (
+          <div className="mt-6 border-t pt-6">
+            {children}
+          </div>
+        )}
       </Card>
     </AdminPageSection>
   );

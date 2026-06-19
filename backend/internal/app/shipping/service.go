@@ -8,4 +8,7 @@ import (
 type Service interface {
 	GetRates(req *schemas.ShippingRatesRequest) (int, interface{})
 	GetAllPagination(payload *model.JwtPayload, req *schemas.GetAllPagination) (int, interface{})
+	GetProvinces() (int, interface{})
+	GetCities(provinceID string) (int, interface{})
+	GetDistricts(cityID string) (int, interface{})
 }

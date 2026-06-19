@@ -1,7 +1,8 @@
 "use client";
 
-import Card from "@/components/ui/Card"; // Sesuaikan path jika berbeda
-import { Activity, TrendingUp } from "lucide-react";
+import { useEffect, useState } from "react";
+import Card from "@/components/ui/Card";
+import { Activity, TrendingUp, Loader2 } from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -11,28 +12,57 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { ordersApi } from "@/server/index";
+import type { RevenueStatsResponse } from "@/server/modules/orders/types";
 
-const revenueData = [
-  { label: "Mon", value: 2.4 },
-  { label: "Tue", value: 3.1 },
-  { label: "Wed", value: 2.8 },
-  { label: "Thu", value: 4.2 },
-  { label: "Fri", value: 5.0 },
-  { label: "Sat", value: 4.5 },
-  { label: "Sun", value: 3.7 },
+// Fallback data
+const fallbackRevenueData = [
+  { label: "Mon", value: 0 },
+  { label: "Tue", value: 0 },
+  { label: "Wed", value: 0 },
+  { label: "Thu", value: 0 },
+  { label: "Fri", value: 0 },
+  { label: "Sat", value: 0 },
+  { label: "Sun", value: 0 },
 ];
 
-// Data diubah menjadi produk pakaian
-const topProducts = [
-  { name: "Jaket Denim Oversize", revenue: "Rp. 9.2 Juta" },
-  { name: "Kemeja Flanel Premium", revenue: "Rp. 7.5 Juta" },
-  { name: "Kaos Basic Cotton", revenue: "Rp. 5.8 Juta" },
+const fallbackTopProducts = [
+  { name: "Belum ada data", revenue: "Rp. 0" },
 ];
 
 const RevenueChart = () => {
-  const totalRevenue = "Rp. 25.000.000";
-  const averageOrderValue = "Rp. 102.000";
-  const growth = "+18.4%";
+  const [stats, setStats] = useState<RevenueStatsResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await ordersApi.getRevenueStats();
+        if (res.data) {
+          setStats(res.data);
+        }
+      } catch (err) {
+        console.error("Failed to load revenue stats", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  const chartData = stats?.revenue_data?.length ? stats.revenue_data : fallbackRevenueData;
+  const topProductsList = stats?.top_products?.length ? stats.top_products : fallbackTopProducts;
+  const totalRev = stats?.total_revenue || "Rp. 0";
+  const avgOrderVal = stats?.average_order_value || "Rp. 0";
+  const growthRate = stats?.growth || "0%";
+
+  if (isLoading) {
+    return (
+      <Card className="p-6 min-h-[400px] flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </Card>
+    );
+  }
 
   return (
     <Card className="p-6">
@@ -52,7 +82,7 @@ const RevenueChart = () => {
 
         <div className="flex items-center gap-3 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-700">
           <TrendingUp className="h-4 w-4 text-emerald-600" />
-          <span className="font-semibold">Growth {growth}</span>
+          <span className="font-semibold">Growth {growthRate}</span>
         </div>
       </div>
 
@@ -61,7 +91,7 @@ const RevenueChart = () => {
           <div className="w-full min-h-65">
             <ResponsiveContainer width="100%" height={260}>
               <BarChart
-                data={revenueData}
+                data={chartData}
                 margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
               >
                 <defs>
@@ -95,7 +125,11 @@ const RevenueChart = () => {
                   axisLine={false}
                   tickLine={false}
                   tick={{ fill: "#64748b", fontSize: 12 }}
-                  tickFormatter={(value) => `${value}M`}
+                  tickFormatter={(value) => {
+                    if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
+                    if (value >= 1000) return `${(value / 1000).toFixed(0)}k`;
+                    return value;
+                  }}
                 />
 
                 <Tooltip
@@ -108,11 +142,12 @@ const RevenueChart = () => {
                   }}
                   formatter={(value) => {
                     const rawValue = Array.isArray(value) ? value[0] : value;
-                    const formatted =
-                      typeof rawValue === "number"
-                        ? rawValue
-                        : Number(rawValue ?? 0);
-                    return [`Rp. ${formatted} Juta`, "Revenue"];
+                    const formatted = typeof rawValue === "number" ? rawValue : Number(rawValue ?? 0);
+                    // Recharts tooltip format
+                    let displayVal = `${formatted}`;
+                    if (formatted >= 1000000) displayVal = `Rp. ${(formatted / 1000000).toFixed(1)} Juta`;
+                    else displayVal = `Rp. ${formatted.toLocaleString('id-ID')}`;
+                    return [displayVal, "Revenue"];
                   }}
                   labelStyle={{ color: "#64748b", marginBottom: "4px" }}
                 />
@@ -133,7 +168,7 @@ const RevenueChart = () => {
                 Total Revenue
               </p>
               <p className="mt-2 text-lg font-semibold text-slate-900">
-                {totalRevenue}
+                {totalRev}
               </p>
             </div>
             <div>
@@ -141,7 +176,7 @@ const RevenueChart = () => {
                 Avg. Order
               </p>
               <p className="mt-2 text-lg font-semibold text-slate-900">
-                {averageOrderValue}
+                {avgOrderVal}
               </p>
             </div>
           </div>
@@ -160,14 +195,14 @@ const RevenueChart = () => {
             </div>
           </div>
           <div className="space-y-3">
-            {topProducts.map((product) => (
+            {topProductsList.map((product, idx) => (
               <div
-                key={product.name}
+                key={`${product.name}-${idx}`}
                 className="rounded-2xl bg-white px-4 py-3 shadow-sm"
               >
                 <div className="flex items-center justify-between gap-3">
-                  <p className="font-medium text-slate-900">{product.name}</p>
-                  <span className="text-sm text-slate-500">
+                  <p className="font-medium text-slate-900 line-clamp-1 flex-1 pr-2" title={product.name}>{product.name}</p>
+                  <span className="text-sm text-slate-500 whitespace-nowrap">
                     {product.revenue}
                   </span>
                 </div>

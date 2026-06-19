@@ -84,6 +84,8 @@ type UpdateProduct struct {
 	Weight         float64 `json:"weight" validate:"omitempty,gte=0"`
 	SeoTitle       string  `json:"seo_title" validate:"omitempty,max=255"`
 	SeoDescription string  `json:"seo_description"`
-	Status         string  `json:"status" validate:"omitempty,oneof=active draft archived"`
-	IsActive       *bool   `json:"is_active"`
+	Status         string                       `json:"status" validate:"omitempty,oneof=active draft archived"`
+	IsActive       *bool                        `json:"is_active"`
+	Variants       []CreateProductVariant       `json:"variants"`
+	Specifications []CreateProductSpecification `json:"specifications"`
 }

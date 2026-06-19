@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -76,7 +77,19 @@ func main() {
 	e.Use(
 		middleware.Recover(),
 		middleware.CORSWithConfig(middleware.CORSConfig{
-			AllowOrigins:     []string{"http://localhost:3000", "http://localhost:8080"},
+			AllowOriginFunc: func(origin string) (bool, error) {
+				allowed := []string{"http://localhost:3000", "http://localhost:8080"}
+				// Load extra origins from env (e.g. ngrok URLs)
+				if extra := os.Getenv("CORS_ORIGINS"); extra != "" {
+					allowed = append(allowed, strings.Split(extra, ",")...)
+				}
+				for _, o := range allowed {
+					if strings.TrimSpace(o) == origin {
+						return true, nil
+					}
+				}
+				return false, nil
+			},
 			AllowMethods:     []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete, http.MethodOptions, http.MethodPatch},
 			AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
 			AllowCredentials: true,

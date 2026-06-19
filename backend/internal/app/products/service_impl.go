@@ -405,6 +405,83 @@ func (s ServiceImpl) UpdateProduct(payload *model.JwtPayload, id string, req *sc
 		return res.BuildCustomResponse(res.StatusFailed, http.StatusInternalServerError, []string{err.Error()}, res.MsgUpdateFailed, nil)
 	}
 
+	// Synchronize variants
+	if len(req.Variants) > 0 {
+		existingVariants, _ := s.productRepo.FindVariantsByProductID(result.ID)
+		
+		for _, incoming := range req.Variants {
+			var matched *model.MstProductVariant
+			for i, ev := range existingVariants {
+				if ev.Color == incoming.Color && ev.Size == incoming.Size {
+					matched = &existingVariants[i]
+					break
+				}
+			}
+
+			if matched != nil {
+				matched.SKU = incoming.SKU
+				matched.Stock = incoming.Stock
+				matched.Weight = incoming.Weight
+				matched.PriceAdjustment = incoming.PriceAdjustment
+				matched.IsActive = incoming.IsActive
+				if payload != nil {
+					matched.UpdatedBy = &payload.UserID
+				}
+				s.productRepo.UpdateVariant(*matched)
+			} else {
+				newVariant := model.MstProductVariant{
+					ProductID:       result.ID,
+					Color:           incoming.Color,
+					Size:            incoming.Size,
+					SKU:             incoming.SKU,
+					Barcode:         incoming.Barcode,
+					Stock:           incoming.Stock,
+					Weight:          incoming.Weight,
+					PriceAdjustment: incoming.PriceAdjustment,
+					IsActive:        incoming.IsActive,
+				}
+				if payload != nil {
+					newVariant.CreatedBy = payload.UserID
+				}
+				s.productRepo.SaveVariant(newVariant)
+			}
+		}
+
+		// Disable variants that are not in the incoming request
+		for _, ev := range existingVariants {
+			found := false
+			for _, incoming := range req.Variants {
+				if ev.Color == incoming.Color && ev.Size == incoming.Size {
+					found = true
+					break
+				}
+			}
+			if !found && ev.IsActive {
+				ev.IsActive = false
+				if payload != nil {
+					ev.UpdatedBy = &payload.UserID
+				}
+				s.productRepo.UpdateVariant(ev)
+			}
+		}
+	}
+
+	// Synchronize specifications
+	if req.Specifications != nil {
+		// Delete existing specifications
+		s.productRepo.DeleteAllSpecificationsByProductID(result.ID)
+		
+		// Insert new specifications
+		for _, sp := range req.Specifications {
+			spec := model.MstProductSpecification{
+				ProductID: result.ID,
+				SpecName:  sp.SpecName,
+				SpecValue: sp.SpecValue,
+			}
+			s.productRepo.SaveSpecification(spec)
+		}
+	}
+
 	full, _ := s.productRepo.FindByID(result.ID)
 	if full != nil {
 		return res.BuildCustomResponse(res.StatusSuccess, http.StatusOK, nil, res.MsgUpdateSuccess, toProductDetailResponse(*full))
@@ -470,8 +547,14 @@ func (s ServiceImpl) UploadProductImage(payload *model.JwtPayload, productID str
 		return res.BuildCustomResponse(res.StatusFailed, http.StatusInternalServerError, []string{"failed to upload image: " + err.Error()}, res.MsgAddFailed, nil)
 	}
 
-	// If set as thumbnail, unset all previous thumbnails
-	if isThumbnail {
+	// Check if this is the first image for the product
+	existingImages, _ := s.productRepo.FindImagesByProductID(parsedID)
+	if len(existingImages) == 0 {
+		isThumbnail = true
+	}
+
+	// If set as thumbnail manually or automatically, unset all previous thumbnails
+	if isThumbnail && len(existingImages) > 0 {
 		s.productRepo.UnsetAllThumbnails(parsedID)
 	}
 

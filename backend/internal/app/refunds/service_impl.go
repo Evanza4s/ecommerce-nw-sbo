@@ -1,6 +1,7 @@
 package refunds
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -52,6 +53,13 @@ func (s ServiceImpl) Create(payload *model.JwtPayload, req *schemas.CreateRefund
 	// Update order status to indicate refund is pending/requested
 	_ = s.orderRepo.UpdateOrderStatus(parsedOrderID, "Refund")
 
+	var urls []string
+	if req.EvidenceURL != "" {
+		if err := json.Unmarshal([]byte(req.EvidenceURL), &urls); err != nil {
+			urls = []string{req.EvidenceURL}
+		}
+	}
+
 	now, _ := util.GetTimeNow("Asia/Jakarta")
 	refund := &model.TrxRefund{
 		OrderID:      parsedOrderID,
@@ -64,13 +72,17 @@ func (s ServiceImpl) Create(payload *model.JwtPayload, req *schemas.CreateRefund
 	}
 	refund.CreatedAt = now
 
+	for _, url := range urls {
+		refund.Evidences = append(refund.Evidences, model.TrxRefundEvidence{
+			FileURL:  url,
+			FileType: "image",
+		})
+	}
+
 	createdRefund, err := s.refundRepo.CreateRefund(refund)
 	if err != nil {
 		return res.BuildCustomResponse(res.StatusFailed, http.StatusInternalServerError, []string{err.Error()}, "Failed to create refund", nil)
 	}
-
-	// If evidence URL provided, you might want to save it to TrxRefundEvidence
-	// Assuming TrxRefundEvidence is handled elsewhere or you add it here
 
 	return res.BuildCustomResponse(res.StatusSuccess, http.StatusCreated, nil, "Refund requested successfully", schemas.RefundResponse{
 		ID:           createdRefund.ID.String(),
@@ -124,7 +136,14 @@ func (s ServiceImpl) GetAll(payload *model.JwtPayload, req *schemas.GetAllPagina
 		}
 		evidenceURL := ""
 		if len(r.Evidences) > 0 {
-			evidenceURL = r.Evidences[0].FileURL
+			var urls []string
+			for _, e := range r.Evidences {
+				urls = append(urls, e.FileURL)
+			}
+			if len(urls) > 0 {
+				b, _ := json.Marshal(urls)
+				evidenceURL = string(b)
+			}
 		}
 		responseList = append(responseList, schemas.RefundResponse{
 			ID:           r.ID.String(),
@@ -184,7 +203,14 @@ func (s ServiceImpl) GetByID(payload *model.JwtPayload, id string) (int, interfa
 	}
 	evidenceURL := ""
 	if len(refund.Evidences) > 0 {
-		evidenceURL = refund.Evidences[0].FileURL
+		var urls []string
+		for _, e := range refund.Evidences {
+			urls = append(urls, e.FileURL)
+		}
+		if len(urls) > 0 {
+			b, _ := json.Marshal(urls)
+			evidenceURL = string(b)
+		}
 	}
 
 	return res.BuildCustomResponse(res.StatusSuccess, http.StatusOK, nil, "Refund retrieved successfully", schemas.RefundResponse{

@@ -11,5 +11,6 @@ type Service interface {
 	GetOrderByID(id string) (int, interface{})
 	GetSnapToken(orderID string, userID string) (int, interface{})
 	UpdateOrderStatus(id string, req *schemas.UpdateOrderStatusRequest) (int, interface{})
+	GetRevenueStats() (int, interface{})
 	GetMyOrders(userID string) (int, interface{})
 }

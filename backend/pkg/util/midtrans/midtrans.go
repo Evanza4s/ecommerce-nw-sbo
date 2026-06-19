@@ -6,6 +6,7 @@ import (
 	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/coreapi"
 	"github.com/midtrans/midtrans-go/snap"
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -15,7 +16,8 @@ var (
 
 func InitMidtrans() {
 	serverKey := os.Getenv("MIDTRANS_SERVER")
-	env := midtrans.Sandbox // change to midtrans.Production for live
+	logrus.Infof("Midtrans InitMidtrans - server key length: %d", len(serverKey))
+	env := midtrans.Sandbox // FORCED SANDBOX
 
 	SnapClient.New(serverKey, env)
 	CoreAPIClient.New(serverKey, env)

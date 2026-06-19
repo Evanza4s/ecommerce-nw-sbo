@@ -44,8 +44,11 @@ func (s ServiceImpl) GetAddresses(payload *model.JwtPayload, userID string) (int
 			UserID:       addr.UserID,
 			ReceiverName: addr.ReceiverName,
 			PhoneNumber:  addr.PhoneNumber,
+			ProvinceID:   addr.ProvinceID,
 			Province:     addr.Province,
+			CityID:       addr.CityID,
 			City:         addr.City,
+			DistrictID:   addr.DistrictID,
 			District:     addr.District,
 			Village:      addr.Village,
 			PostalCode:   addr.PostalCode,
@@ -85,8 +88,11 @@ func (s ServiceImpl) GetAddressByID(payload *model.JwtPayload, userID string, ad
 		UserID:       address.UserID,
 		ReceiverName: address.ReceiverName,
 		PhoneNumber:  address.PhoneNumber,
+		ProvinceID:   address.ProvinceID,
 		Province:     address.Province,
+		CityID:       address.CityID,
 		City:         address.City,
+		DistrictID:   address.DistrictID,
 		District:     address.District,
 		Village:      address.Village,
 		PostalCode:   address.PostalCode,
@@ -119,8 +125,11 @@ func (s ServiceImpl) CreateAddress(payload *model.JwtPayload, userID string, req
 		UserID:       parsedID,
 		ReceiverName: req.ReceiverName,
 		PhoneNumber:  req.PhoneNumber,
+		ProvinceID:   req.ProvinceID,
 		Province:     req.Province,
+		CityID:       req.CityID,
 		City:         req.City,
+		DistrictID:   req.DistrictID,
 		District:     req.District,
 		Village:      req.Village,
 		PostalCode:   req.PostalCode,
@@ -170,11 +179,20 @@ func (s ServiceImpl) UpdateAddress(payload *model.JwtPayload, userID string, add
 	if req.PhoneNumber != "" {
 		address.PhoneNumber = req.PhoneNumber
 	}
+	if req.ProvinceID != "" {
+		address.ProvinceID = req.ProvinceID
+	}
 	if req.Province != "" {
 		address.Province = req.Province
 	}
+	if req.CityID != "" {
+		address.CityID = req.CityID
+	}
 	if req.City != "" {
 		address.City = req.City
+	}
+	if req.DistrictID != "" {
+		address.DistrictID = req.DistrictID
 	}
 	if req.District != "" {
 		address.District = req.District

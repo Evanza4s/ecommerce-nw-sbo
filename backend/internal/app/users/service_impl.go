@@ -56,6 +56,7 @@ func (s ServiceImpl) GetAll(payload *model.JwtPayload, req *schemas.GetAllPagina
 	}
 
 	pageInfo.Count = count
+	pageInfo.TotalPages = utils.CalculateTotalPages(count, pageInfo.PageSize)
 
 	// Convert to response
 	var responses []schemas.UserResponse

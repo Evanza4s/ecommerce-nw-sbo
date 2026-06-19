@@ -173,7 +173,6 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* BOTTOM */}
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-light/10 pt-6 text-sm text-light/60 md:flex-row">
 
           <p>

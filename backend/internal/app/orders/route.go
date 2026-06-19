@@ -13,5 +13,6 @@ func (h Handler) Route(g *echo.Group) {
 	g.GET("/my-orders", h.GetMyOrders)
 	g.GET("/:id", h.GetOrderByID)
 	g.GET("/:id/pay", h.GetSnapToken)
+	g.GET("/revenue/stats", h.GetRevenueStats)
 	g.PUT("/:id/status", h.UpdateOrderStatus)
 }

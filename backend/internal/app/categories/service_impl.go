@@ -48,6 +48,7 @@ func (s ServiceImpl) GetAllPagination(payload *model.JwtPayload, req *schemas.Ge
 	}
 
 	pageInfo.Count = count
+	pageInfo.TotalPages = utils.CalculateTotalPages(count, pageInfo.PageSize)
 	return res.BuildCustomResponsePagination(res.StatusSuccess, http.StatusOK, nil, res.MsgGetSuccess, dCategory, pageInfo)
 }
 

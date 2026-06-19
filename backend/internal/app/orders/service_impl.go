@@ -14,7 +14,6 @@ import (
 	"github.com/Evanza4s/ecommerce-nw-sbo.git/pkg/util"
 	"github.com/Evanza4s/ecommerce-nw-sbo.git/db"
 	"github.com/Evanza4s/ecommerce-nw-sbo.git/pkg/util/midtrans"
-	"github.com/Evanza4s/ecommerce-nw-sbo.git/pkg/util/rajaongkir"
 	"github.com/Evanza4s/ecommerce-nw-sbo.git/pkg/util/res"
 	"github.com/google/uuid"
 	midtransSnap "github.com/midtrans/midtrans-go/snap"
@@ -89,8 +88,8 @@ func (s ServiceImpl) Checkout(payload *model.JwtPayload, userID string, req *sch
 
 		subtotal += price * float64(item.Quantity)
 		
-		// asumsi berat varian dalam gram
-		weight := int(variant.Weight * 1000) 
+		// Weight varian sudah dalam gram
+		weight := int(variant.Weight)
 		if weight == 0 {
 			weight = 1000 // default 1kg jika 0
 		}
@@ -104,40 +103,10 @@ func (s ServiceImpl) Checkout(payload *model.JwtPayload, userID string, req *sch
 		})
 	}
 
-	// 4. Hitung Ongkir dari RajaOngkir
-	// FIXME: Gunakan City ID valid untuk Origin dan Destination. 
-	// Karena MstAddress saat ini menyimpan nama kota string,
-	// kita membutuhkan mapping atau input City ID yang valid dari frontend.
-	// Asumsi untuk saat ini: req.Destination bisa dipassing by frontend atau menggunakan 1 default "114" (Denpasar).
-	// Di sini kita coba pakai 114 (Denpasar) sebagai tujuan jika `address.City` bukan numeric ID.
-	originCityID := "153" // Jakarta Selatan
-	destCityID := "114"   // Default Denpasar
-
-	if resolvedID, err := rajaongkir.GetCityIDByName(address.City); err == nil && resolvedID != "" {
-		destCityID = resolvedID
-	}
-
-	roReq := &rajaongkir.CostRequest{
-		Origin:      originCityID,
-		Destination: destCityID,
-		Weight:      totalWeight,
-		Courier:     req.Courier,
-	}
-
-	roRes, err := rajaongkir.CalculateCost(roReq)
-	var shippingCost float64 = 0
-
-	if err == nil && len(roRes.RajaOngkir.Results) > 0 {
-		for _, cost := range roRes.RajaOngkir.Results[0].Costs {
-			if cost.Service == req.ShippingService && len(cost.Cost) > 0 {
-				shippingCost = float64(cost.Cost[0].Value)
-				break
-			}
-		}
-	}
-
-	if shippingCost == 0 {
-		shippingCost = 15000 // Fallback sementara jika api key rajaongkir error/limit
+	// 4. Gunakan ongkir dari frontend (sudah dihitung oleh RajaOngkir di frontend)
+	shippingCost := req.ShippingCost
+	if shippingCost <= 0 {
+		shippingCost = 15000 // Fallback jika ongkir tidak dikirim
 	}
 
 	// 5. Validasi Voucher
@@ -386,3 +355,12 @@ func (s ServiceImpl) GetMyOrders(userID string) (int, interface{}) {
 
 	return res.BuildCustomResponse(res.StatusSuccess, http.StatusOK, nil, "Orders fetched successfully", orders)
 }
+
+func (s ServiceImpl) GetRevenueStats() (int, interface{}) {
+	stats, err := s.orderRepo.GetRevenueStats()
+	if err != nil {
+		return res.BuildCustomResponse(res.StatusFailed, http.StatusInternalServerError, []string{err.Error()}, "Failed to get revenue stats", nil)
+	}
+	return res.BuildCustomResponse(res.StatusSuccess, http.StatusOK, nil, "Revenue stats fetched successfully", stats)
+}
+

@@ -19,6 +19,7 @@ type TrxRefund struct {
 	AdminNotes   string              `json:"admin_notes" gorm:"type:text"`
 	ApprovedAt   *time.Time          `json:"approved_at"`
 	OrderRef     *MstOrders           `gorm:"foreignKey:OrderID"`
+	UserRef      *MstUsers           `gorm:"foreignKey:UserID"`
 	Evidences    []TrxRefundEvidence `gorm:"foreignKey:RefundID"`
 }
 

@@ -18,6 +18,8 @@ type MstProductVariant struct {
 	VariantImage    string     `json:"variant_image" gorm:"type:text"`
 	IsActive        bool       `json:"is_active" gorm:"default:true"`
 	ProductRef      *MstProduct `gorm:"foreignKey:ProductID"`
+	CartItems       []MstCartItem `gorm:"foreignKey:ProductVariantID"`
+	OrderItems      []MstOrderItem `gorm:"foreignKey:ProductVariantID"`
 }
 
 func (MstProductVariant) TableName() string {

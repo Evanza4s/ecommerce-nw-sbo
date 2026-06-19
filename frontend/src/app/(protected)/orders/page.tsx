@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   Breadcrumb,
@@ -9,49 +9,35 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import PageSection from "@/components/ui/PageSection";
-import { DEMO_ORDER_ID, userRoutes } from "@/lib/user-routes";
+import { userRoutes } from "@/lib/user-routes";
 import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package } from "lucide-react";
-import OrderCard, { OrderData } from "@/components/order/OrderCard";
+import { Package, Loader2 } from "lucide-react";
+import OrderCard from "@/components/order/OrderCard";
+import { cn } from "@/lib/utils";
+import { useMyOrders } from "@/hooks/useMyOrders";
+import { formatCurrency, formatDate } from "@/lib/admin";
 
-const ORDER_TABS = ["All", "Pending", "Paid", "Shipped", "Delivered", "Cancelled", "Refund"];
-
-const demoOrders: OrderData[] = [
-  {
-    id: DEMO_ORDER_ID,
-    status: "Shipped",
-    total: "Rp 1.250.000",
-    date: "04 Jun 2026",
-    items: [
-      {
-        name: "Nike Air Force 1 '07",
-        variant: "White, Size 42",
-        qty: 1,
-        image: "https://placehold.co/100x100?text=AF1",
-      },
-    ],
-  },
-  {
-    id: "ORD-XYZ-998877-11223",
-    status: "Delivered",
-    total: "Rp 875.000",
-    date: "31 Mei 2026",
-    items: [
-      {
-        name: "NWV Premium Hoodie",
-        variant: "Black, Size L",
-        qty: 1,
-        image: "https://placehold.co/100x100?text=Hoodie",
-      },
-    ],
-  },
+const ORDER_TABS = [
+  "All",
+  "Pending",
+  "Paid",
+  "Shipped",
+  "Delivered",
+  "Cancelled",
+  "Refund",
 ];
 
 export default function OrdersPage() {
   const [activeTab, setActiveTab] = useState("All");
+  const { orders, loading, error } = useMyOrders();
 
-  const filteredOrders = demoOrders.filter((o) => (activeTab === "All" ? true : o.status === activeTab));
+  const filteredOrders = (orders || []).filter((o) => {
+    if (activeTab === "All") return true;
+    if (activeTab === "Pending") return o.order_status?.toLowerCase() === "pending" || o.payment_status?.toLowerCase() === "pending";
+    return o.order_status?.toLowerCase() === activeTab.toLowerCase();
+  });
+
   return (
     <PageSection
       title="My Orders"
@@ -70,28 +56,57 @@ export default function OrdersPage() {
         </BreadcrumbList>
       </Breadcrumb>
 
-<Tabs defaultValue="All" onValueChange={setActiveTab} className="w-full">
-        <TabsList className="w-full justify-start overflow-x-auto bg-transparent border-b rounded-none h-auto p-0 mb-8 scrollbar-hide">
-          {ORDER_TABS.map((tab) => (
-            <TabsTrigger
-              key={tab}
-              value={tab}
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-6 py-3 font-semibold transition-all"
-            >
-              {tab}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+      <Tabs
+        defaultValue="All"
+        onValueChange={setActiveTab}
+        className="w-full mt-8"
+      >
+        <div className="w-full overflow-x-auto pb-4 scrollbar-hide">
+          <TabsList className="flex h-13 border w-full min-w-max items-center justify-center rounded-full bg-slate-100/80 p-6">
+            {ORDER_TABS.map((tab) => (
+              <TabsTrigger
+                key={tab}
+                value={tab}
+                className={cn(
+                  "inline-flex items-center justify-center whitespace-nowrap rounded-full px-6 py-4 text-sm font-medium transition-all",
+                  "text-slate-500 hover:text-slate-900",
+
+                  "data-[state=active]:bg-secondary-divider py-4 data-[state=active]:text-light data-[state=active]:shadow-sm data-[state=active]:font-bold",
+                )}
+              >
+                {tab}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
+
+        {error && (
+          <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-600 my-6">
+            {error}
+          </div>
+        )}
 
         <div className="grid gap-6">
-          {filteredOrders.length === 0 ? (
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
+              <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
+              <p className="text-slate-500">Memuat data pesanan...</p>
+            </div>
+          ) : filteredOrders.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
               <Package className="w-12 h-12 text-slate-300 mb-4" />
-              <h3 className="text-lg font-bold text-slate-900">Pesanan tidak ditemukan</h3>
-              <p className="text-slate-500">Anda tidak memiliki riwayat pesanan dengan status &quot;{activeTab}&quot;</p>
+              <h3 className="text-lg font-bold text-slate-900">
+                Pesanan tidak ditemukan
+              </h3>
+              <p className="text-slate-500 mt-1">
+                Anda tidak memiliki riwayat pesanan dengan status &quot;
+                {activeTab}&quot;
+              </p>
             </div>
           ) : (
-            filteredOrders.map((order) => <OrderCard key={order.id} order={order} />)
+            filteredOrders.map((order) => (
+              <OrderCard key={order.id} order={order} />
+            ))
           )}
         </div>
       </Tabs>

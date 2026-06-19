@@ -6,56 +6,83 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"; // Pastikan path import ini sesuai dengan project Anda
+} from "@/components/ui/table";
+import type { ProductDetail } from "@/server/modules/products/types";
+import { useMemo } from "react";
 
-const generalSpecification = [
-  { label: "Product Name", value: "Nike Air Force 1 '07" },
-  { label: "Brand", value: "Nike" },
-  { label: "Category", value: "Sneakers" },
-  { label: "Style", value: "Lifestyle" },
-  { label: "Upper Material", value: "Premium Leather" },
-  { label: "Midsole", value: "Nike Air Cushioning" },
-  { label: "Outsole", value: "Rubber" },
-  { label: "Gender", value: "Unisex" },
-  { label: "Weight", value: "± 420 g / shoe" },
-];
+type ProductSpecificationProps = {
+  product: ProductDetail;
+};
 
-const sizeChart = [
-  { size: "39", length: "24.5 cm" },
-  { size: "40", length: "25 cm" },
-  { size: "41", length: "26 cm" },
-  { size: "42", length: "26.5 cm" },
-  { size: "43", length: "27.5 cm" },
-  { size: "44", length: "28 cm" },
-];
+const ProductSpecification = ({ product }: ProductSpecificationProps) => {
+  // Map general specifications from API
+  const generalSpecification = useMemo(() => {
+    const baseSpecs = [
+      { label: "Kategori", value: product.category?.category_name || "-" },
+      { label: "Merek", value: product.brand || "-" },
+      { label: "Gender", value: product.gender === "male" ? "Pria" : product.gender === "female" ? "Wanita" : product.gender === "unisex" ? "Unisex" : "-" },
+      { label: "Material", value: product.material || "-" },
+      { label: "Berat", value: product.weight ? `${product.weight} gram` : "-" },
+    ];
 
-const ProductSpecification = () => {
+    // Add dynamic specifications from API (filter out size chart)
+    const dynamicSpecs = product.specifications
+      .filter((spec) => !spec.spec_name.startsWith("Size Chart - "))
+      .map((spec) => ({
+        label: spec.spec_name,
+        value: spec.spec_value,
+      }));
+
+    return [...baseSpecs, ...dynamicSpecs];
+  }, [product]);
+
+  // Extract size chart from specifications
+  const sizeChartList = useMemo(() => {
+    const fromSpecs = product.specifications
+      .filter((spec) => spec.spec_name.startsWith("Size Chart - "))
+      .map((spec) => ({
+        size: spec.spec_name.replace("Size Chart - ", ""),
+        length: spec.spec_value,
+      }));
+      
+    // If we have size chart defined in specs, use it.
+    if (fromSpecs.length > 0) return fromSpecs;
+    
+    // Fallback to just listing sizes if no detailed size chart is provided
+    return Array.from(new Set(product.variants.map((v) => v.size).filter(Boolean))).map(size => ({
+      size,
+      length: "-"
+    }));
+  }, [product.specifications, product.variants]);
+
+  if (generalSpecification.length === 0 && sizeChartList.length === 0) {
+    return null;
+  }
+
   return (
     <PublicSection className="px-0 py-0">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold text-slate-900">Product Specification</h2>
-        <div className="mt-3 h-1 w-72 bg-slate-900" />
+        <h2 className="text-3xl font-bold text-slate-900">Spesifikasi Produk</h2>
+        <div className="mt-3 h-1 w-48 bg-slate-900" />
       </div>
 
-      {/* Content */}
       <div className="grid gap-8 lg:grid-cols-2">
-        
         {/* General */}
-        <div className="rounded-3xl bg-primary/10 p-6">
-          <h3 className="mb-6 text-2xl font-bold text-slate-900">General</h3>
+        <div className="rounded-3xl bg-primary/5 p-6 border border-primary/10">
+          <h3 className="mb-6 text-xl font-bold text-slate-900">General</h3>
           
           <div className="overflow-hidden rounded-2xl border bg-white shadow-sm">
             <Table>
               <TableBody>
-                {generalSpecification.map((item) => (
+                {generalSpecification.map((item, index) => (
                   <TableRow 
-                    key={item.label} 
-                    className="hover:bg-transparent" // Menghilangkan efek hover abu-abu bawaan
+                    key={index} 
+                    className="hover:bg-transparent"
                   >
-                    <TableCell className="w-1/2 py-4 pl-5 font-medium text-slate-500">
+                    <TableCell className="w-[40%] py-3 pl-5 font-medium text-slate-500 border-r">
                       {item.label}
                     </TableCell>
-                    <TableCell className="w-1/2 py-4 pr-5 text-right font-semibold text-slate-900">
+                    <TableCell className="w-[60%] py-3 pl-5 font-semibold text-slate-900">
                       {item.value}
                     </TableCell>
                   </TableRow>
@@ -65,40 +92,42 @@ const ProductSpecification = () => {
           </div>
         </div>
 
-        {/* Size Chart */}
-        <div className="rounded-3xl bg-primary/10 p-6">
-          <h3 className="mb-6 text-2xl font-bold text-slate-900">Size Chart</h3>
+        {/* Available Sizes List / Size Chart */}
+        {sizeChartList.length > 0 && (
+          <div className="rounded-3xl bg-primary/5 p-6 border border-primary/10">
+            <h3 className="mb-6 text-xl font-bold text-slate-900">Panduan Ukuran (Size Chart)</h3>
 
-          <div className="overflow-hidden rounded-2xl border bg-white shadow-sm">
-            <Table>
-              <TableHeader className="bg-slate-50">
-                <TableRow className="hover:bg-slate-50">
-                  <TableHead className="w-1/2 py-4 pl-5 font-semibold text-slate-900">
-                    EU Size
-                  </TableHead>
-                  <TableHead className="w-1/2 py-4 pr-5 text-right font-semibold text-slate-900">
-                    Foot Length
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {sizeChart.map((item) => (
-                  <TableRow 
-                    key={item.size}
-                    className="hover:bg-slate-50/50"
-                  >
-                    <TableCell className="py-4 pl-5 font-semibold text-slate-900">
-                      {item.size}
-                    </TableCell>
-                    <TableCell className="py-4 pr-5 text-right text-slate-600">
-                      {item.length}
-                    </TableCell>
+            <div className="overflow-hidden rounded-2xl border bg-white shadow-sm">
+              <Table>
+                <TableHeader className="bg-slate-50">
+                  <TableRow className="hover:bg-slate-50">
+                    <TableHead className="py-3 pl-5 font-semibold text-slate-900 border-r w-1/2">
+                      Ukuran
+                    </TableHead>
+                    <TableHead className="py-3 pl-5 font-semibold text-slate-900 w-1/2">
+                      Panjang/Lebar (cm)
+                    </TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {sizeChartList.map((item) => (
+                    <TableRow 
+                      key={item.size}
+                      className="hover:bg-slate-50/50"
+                    >
+                      <TableCell className="py-3 pl-5 font-semibold text-slate-900 border-r">
+                        {item.size}
+                      </TableCell>
+                      <TableCell className="py-3 pl-5 font-medium text-slate-500">
+                        {item.length}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </PublicSection>
   );

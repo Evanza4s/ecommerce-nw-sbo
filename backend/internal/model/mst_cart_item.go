@@ -11,6 +11,7 @@ type MstCartItem struct {
 	ProductVariantID  uuid.UUID         `json:"product_variant_id" gorm:"type:uuid;not null"`
 	Quantity          int               `json:"quantity" gorm:"not null"`
 	CartRef           *MstCart           `gorm:"foreignKey:CartID"`
+	ProductVariantRef *MstProductVariant `gorm:"foreignKey:ProductVariantID"`
 }
 
 func (MstCartItem) TableName() string {

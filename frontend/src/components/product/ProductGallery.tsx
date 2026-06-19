@@ -1,49 +1,66 @@
 "use client"
-import Image, { StaticImageData } from "next/image";
-import { useState } from "react";
-
-type ProductImage = {
-  src: StaticImageData;
-  alt: string;
-};
+import Image from "next/image";
+import { useState, useEffect } from "react";
+import type { ProductImage } from "@/server/modules/products/types";
+import { getImageUrl } from "@/lib/utils";
 
 type ProductGalleryProps = {
   images: ProductImage[];
 };
 
 const ProductGallery = ({ images }: ProductGalleryProps) => {
-  const [selectedImage, setSelectedImage] = useState(images[0]);
+  const [selectedImage, setSelectedImage] = useState<ProductImage | null>(null);
+
+  useEffect(() => {
+    if (images && images.length > 0) {
+      setSelectedImage(images[0]);
+    }
+  }, [images]);
+
+  if (!images || images.length === 0) {
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="overflow-hidden bg-white rounded-2xl shadow aspect-square flex items-center justify-center text-slate-300">
+          No Image Available
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-4">
-      <div className="overflow-hidden bg-white rounded-2xl shadow">
-        <Image
-          src={selectedImage.src}
-          alt="Main Product Image"
-          width={700}
-          height={700}
-          className="h-auto w-full object-cover"
-        />
+      <div className="overflow-hidden bg-white rounded-2xl shadow aspect-square relative">
+        {selectedImage && (
+          <Image
+            src={getImageUrl(selectedImage.image_url) || ""}
+            alt="Main Product Image"
+            fill
+            className="object-cover"
+            sizes="(max-width: 1024px) 100vw, 50vw"
+            priority
+          />
+        )}
       </div>
-      <div className="flex gap-3 overflow-x-auto">
-        {images.map((image, index) => (
+      <div className="flex gap-3 overflow-x-auto pb-2">
+        {images.map((image) => (
           <button
-            key={index}
+            key={image.id}
             onClick={() => setSelectedImage(image)}
             className={`
-              overflow-hidden rounded-xl border-2
+              relative overflow-hidden rounded-xl border-2 flex-shrink-0 h-20 w-20
               ${
-                selectedImage === image
+                selectedImage?.id === image.id
                   ? "border-primary"
                   : "border-transparent"
               }
             `}
           >
             <Image
-              src={image.src}
-              alt={`Product ${index}`}
-              width={90}
-              height={90}
-              className="h-20 w-20 object-cover"
+              src={getImageUrl(image.image_url) || ""}
+              alt="Product thumbnail"
+              fill
+              className="object-cover"
+              sizes="80px"
             />
           </button>
         ))}

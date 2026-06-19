@@ -1,14 +1,12 @@
 import Divider from "@/components/product/Divider";
 import ProductDetailPage from "@/page/ProductDetail/ProductDetailPage";
-import ProductSpecification from "@/page/ProductDetail/ProductSpesification";
 import RecomendationPage from "@/page/Public/RecomendationPage";
 
-export default function ProductDetailRoute() {
+export default async function ProductDetailRoute({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   return (
     <>
-      <ProductDetailPage />
-      <Divider />
-      <ProductSpecification />
+      <ProductDetailPage slug={slug} />
       <Divider />
       <RecomendationPage />
     </>

@@ -12,6 +12,7 @@ type TrxOrderStatusHistory struct {
 	Notes     string     `json:"notes" gorm:"type:text"`
 	ChangedBy *uuid.UUID `json:"changed_by" gorm:"type:uuid"`
 	OrderRef  *MstOrders  `gorm:"foreignKey:OrderID"`
+	UserRef   *MstUsers  `gorm:"foreignKey:ChangedBy"`
 }
 
 func (TrxOrderStatusHistory) TableName() string {

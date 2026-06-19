@@ -1,26 +1,31 @@
-import AdminDetailPage from "@/components/admin/AdminDetailPage";
+"use client"
+import { ChevronRight } from "lucide-react";
+import Link from "next/link";
+import VoucherForm from "@/components/admin/VoucherForm";
 
 export default function PromotionCreatePage() {
   return (
-    <AdminDetailPage
-      title="Create Promotion"
-      description="Template halaman untuk form pembuatan promo atau voucher."
-      breadcrumbs={[
-        { label: "Dashboard", href: "/admin" },
-        { label: "Promotions", href: "/admin/promotions" },
-        { label: "Create" },
-      ]}
-      summaryTitle="Promotion Schema Recommendation"
-      summaryDescription="Karena tabel promosi belum ada, halaman ini menjadi placeholder yang siap dihubungkan ke mstpromotions atau mstvouchers."
-      secondaryAction={{ label: "Back to Promotions", href: "/admin/promotions" }}
-      items={[
-        { label: "Promo Code", value: "Gunakan kode unik seperti JUNIHEMAT atau WELCOME10." },
-        { label: "Discount Type", value: "Sediakan pilihan Percentage dan Nominal." },
-        { label: "Quota", value: "Batasi jumlah penggunaan promo agar campaign terukur." },
-        { label: "Validity", value: "Pastikan valid_from dan valid_until disimpan sebagai timestamp." },
-        { label: "Status", value: "Gunakan state draft, scheduled, active, dan expired." },
-        { label: "Next Step", value: "Saat backend siap, halaman ini bisa diubah menjadi form CRUD penuh." },
-      ]}
-    />
+    <div className="p-6">
+      <div className="mb-6">
+        <div className="flex items-center text-sm text-zinc-500 mb-4">
+          <Link href="/admin" className="hover:text-zinc-900 transition-colors">
+            Dashboard
+          </Link>
+          <ChevronRight className="h-4 w-4 mx-2" />
+          <Link href="/admin/promotions" className="hover:text-zinc-900 transition-colors">
+            Promotions
+          </Link>
+          <ChevronRight className="h-4 w-4 mx-2" />
+          <span className="text-zinc-900 font-medium">Create</span>
+        </div>
+        
+        <div>
+          <h1 className="text-2xl font-bold text-zinc-900">Create Voucher</h1>
+          <p className="text-zinc-500 mt-1">Create a new discount voucher or promotion code.</p>
+        </div>
+      </div>
+
+      <VoucherForm />
+    </div>
   );
 }

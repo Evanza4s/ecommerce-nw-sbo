@@ -10,8 +10,11 @@ type MstAddress struct {
 	UserID       uuid.UUID `json:"user_id" gorm:"type:uuid;not null"`
 	ReceiverName string    `json:"receiver_name" gorm:"type:varchar(200)"`
 	PhoneNumber  string    `json:"phone_number" gorm:"type:varchar(30)"`
+	ProvinceID   string    `json:"province_id" gorm:"type:varchar(50)"`
 	Province     string    `json:"province" gorm:"type:varchar(150)"`
+	CityID       string    `json:"city_id" gorm:"type:varchar(50)"`
 	City         string    `json:"city" gorm:"type:varchar(150)"`
+	DistrictID   string    `json:"district_id" gorm:"type:varchar(50)"`
 	District     string    `json:"district" gorm:"type:varchar(150)"`
 	Village      string    `json:"village" gorm:"type:varchar(150)"`
 	PostalCode   string    `json:"postal_code" gorm:"type:varchar(20)"`

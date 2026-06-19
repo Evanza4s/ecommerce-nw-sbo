@@ -37,7 +37,7 @@ func (r CategoryRepositoryImpl) GetAllPagination(scopes ...func(db *gorm.DB) *go
 
 func (r CategoryRepositoryImpl) FindAll() ([]model.MstCategory, error) {
 	var data []model.MstCategory
-	if err := r.db.Where("is_active = ?", true).Order("category_name ASC").Find(&data).Error; err != nil {
+	if err := r.db.Where("is_active = ?", true).Order("name ASC").Find(&data).Error; err != nil {
 		return nil, err
 	}
 	return data, nil
@@ -54,7 +54,7 @@ func (r CategoryRepositoryImpl) FindByID(id uuid.UUID) (*model.MstCategory, erro
 
 func (r CategoryRepositoryImpl) FindBySlug(slug string) (*model.MstCategory, error) {
 	var data model.MstCategory
-	if err := r.db.Where("category_slug = ?", slug).First(&data).Error; err != nil {
+	if err := r.db.Where("slug = ?", slug).First(&data).Error; err != nil {
 		return nil, err
 	}
 
@@ -94,7 +94,7 @@ func (r CategoryRepositoryImpl) Delete(data *model.MstCategory) error {
 
 func (r CategoryRepositoryImpl) ExistsBySlug(slug string) (bool, error) {
 	var count int64
-	if err := r.db.Model(&model.MstCategory{}).Where("category_slug = ?", slug).Count(&count).Error; err != nil {
+	if err := r.db.Model(&model.MstCategory{}).Where("slug = ?", slug).Count(&count).Error; err != nil {
 		return false, err
 	}
 	return count > 0, nil

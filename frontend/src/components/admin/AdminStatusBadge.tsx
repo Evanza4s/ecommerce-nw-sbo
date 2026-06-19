@@ -49,7 +49,15 @@ interface AdminStatusBadgeProps {
   label?: string;
 }
 
+const labelOverrides: Record<string, string> = {
+  pending_confirmation: "Pending Confirmation",
+  out_for_delivery: "Out for Delivery",
+  ready_to_ship: "Ready to Ship",
+  in_transit: "In Transit",
+};
+
 const toLabel = (status: string) =>
+  labelOverrides[status] ??
   status
     .split("_")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))

@@ -2,10 +2,9 @@ import { Check } from 'lucide-react';
 import React from 'react';
 
 const steps = [
-  'Dibayar',
-  'Dibungkus',
-  'Dikirim',
-  'Dalam Pengantaran',
+  'Menunggu Pembayaran',
+  'Pesanan Diproses',
+  'Dalam Pengiriman',
   'Terkirim',
 ];
 
@@ -13,7 +12,7 @@ type OrderProgressProps = {
   currentStep?: number;
 };
 
-const OrderProgress = ({ currentStep = 2 }: OrderProgressProps) => {
+const OrderProgress = ({ currentStep = 0 }: OrderProgressProps) => {
   return (
     <section
       aria-labelledby="order-progress-heading"

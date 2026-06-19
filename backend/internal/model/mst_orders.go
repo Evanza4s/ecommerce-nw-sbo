@@ -18,6 +18,8 @@ type MstOrders struct {
 	OrderStatus    string         `json:"order_status" gorm:"type:varchar(50);not null"`
 	PaymentStatus  string         `json:"payment_status" gorm:"type:varchar(50);not null"`
 	Notes          string         `json:"notes" gorm:"type:text"`
+	UserRef        *MstUsers      `gorm:"foreignKey:UserID"`
+	AddressRef     *MstAddress     `gorm:"foreignKey:AddressID"`
 	Items          []MstOrderItem `gorm:"foreignKey:OrderID"`
 	Payment        *MstPayment    `gorm:"foreignKey:OrderID"`
 	Shipping       *MstShipping   `gorm:"foreignKey:OrderID"`

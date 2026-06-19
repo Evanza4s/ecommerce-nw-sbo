@@ -47,6 +47,7 @@ func (s ServiceImpl) GetAllPagination(payload *model.JwtPayload, req *schemas.Ge
 	}
 
 	pageInfo.Count = count
+	pageInfo.TotalPages = utils.CalculateTotalPages(count, pageInfo.PageSize)
 	return res.BuildCustomResponsePagination(res.StatusSuccess, http.StatusOK, nil, res.MsgGetSuccess, dPayment, pageInfo)
 }
 
@@ -64,11 +65,11 @@ func (s ServiceImpl) HandleMidtransWebhook(req *schemas.MidtransNotificationRequ
 		if req.FraudStatus == "challenge" {
 			paymentStatus = "Challenge"
 		} else if req.FraudStatus == "accept" {
-			paymentStatus = "Success"
+			paymentStatus = "Paid"
 			orderStatus = "Processing"
 		}
 	case "settlement":
-		paymentStatus = "Success"
+		paymentStatus = "Paid"
 		orderStatus = "Processing"
 	case "cancel", "deny", "expire":
 		paymentStatus = "Failed"

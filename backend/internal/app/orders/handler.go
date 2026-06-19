@@ -174,3 +174,21 @@ func (h *Handler) GetMyOrders(c echo.Context) error {
 
 	return c.JSON(h.service.GetMyOrders(userInfo.UserID.String()))
 }
+
+// GetRevenueStats retrieves revenue statistics for the admin dashboard
+// @Summary GET Revenue Stats
+// @Description Get revenue statistics
+// @Tags Orders
+// @Security BearerAuth
+// @Produce json
+// @Success 200 {object} res.SuccessConstant
+// @Router /orders/revenue/stats [get]
+func (h *Handler) GetRevenueStats(c echo.Context) error {
+	userInfo := util.UserIDFromToken(c)
+	if userInfo == nil {
+		return res.RespError(c, &res.ErrUnauthorized)
+	}
+
+	return c.JSON(h.service.GetRevenueStats())
+}
+

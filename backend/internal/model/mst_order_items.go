@@ -13,6 +13,7 @@ type MstOrderItem struct {
 	Price             float64           `json:"price" gorm:"type:numeric(18,2);not null"`
 	Subtotal          float64           `json:"subtotal" gorm:"type:numeric(18,2);not null"`
 	OrderRef          *MstOrders         `gorm:"foreignKey:OrderID"`
+	ProductVariantRef *MstProductVariant `gorm:"foreignKey:ProductVariantID"`
 }
 
 func (MstOrderItem) TableName() string {

@@ -1,10 +1,11 @@
 package schemas
 
 type CheckoutRequest struct {
-	AddressID       string `json:"address_id" validate:"required,uuid"`
-	Courier         string `json:"courier" validate:"required"` // e.g., jne, pos, tiki
-	ShippingService string `json:"shipping_service" validate:"required"` // e.g., REG, OKE
-	VoucherCode     string `json:"voucher_code" validate:"omitempty"`
+	AddressID       string  `json:"address_id" validate:"required,uuid"`
+	Courier         string  `json:"courier" validate:"required"` // e.g., jne, pos, tiki
+	ShippingService string  `json:"shipping_service" validate:"required"` // e.g., REG, OKE
+	ShippingCost    float64 `json:"shipping_cost"` // Cost from frontend (already calculated by RajaOngkir)
+	VoucherCode     string  `json:"voucher_code" validate:"omitempty"`
 }
 
 type UpdateOrderStatusRequest struct {

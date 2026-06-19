@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"github.com/Evanza4s/ecommerce-nw-sbo.git/internal/app/orders/schemas"
 	"github.com/Evanza4s/ecommerce-nw-sbo.git/internal/model"
 	"github.com/google/uuid"
 )
@@ -11,6 +12,7 @@ type OrderRepository interface {
 	FindOrdersByUserID(userID uuid.UUID) ([]model.MstOrders, error)
 	FindAllOrders(limit, offset int, search string, status string) ([]model.MstOrders, int64, error)
 	UpdateOrderStatus(id uuid.UUID, status string) error
+	GetRevenueStats() (*schemas.RevenueStatsResponse, error)
 	
 	// Payment
 	FindPaymentByOrderID(orderID uuid.UUID) (*model.MstPayment, error)

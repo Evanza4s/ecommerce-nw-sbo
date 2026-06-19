@@ -81,3 +81,43 @@ func (h Handler) GetAllPagination(c echo.Context) (err error) {
 	jwtPayload := util.UserIDFromToken(c)
 	return c.JSON(h.service.GetAllPagination(jwtPayload, req))
 }
+
+// @Summary GET Provinces
+// @Description Get all provinces from RajaOngkir
+// @Tags Shipping
+// @Accept json
+// @Produce json
+// @Success 200 {object} res.ErrorConstant
+// @Failure 400 {object} res.ErrorConstant
+// @Router /shipping/provinces [get]
+func (h Handler) GetProvinces(c echo.Context) error {
+	return c.JSON(h.service.GetProvinces())
+}
+
+// @Summary GET Cities
+// @Description Get all cities from RajaOngkir by province ID
+// @Tags Shipping
+// @Accept json
+// @Produce json
+// @Param province_id query string false "Province ID"
+// @Success 200 {object} res.ErrorConstant
+// @Failure 400 {object} res.ErrorConstant
+// @Router /shipping/cities [get]
+func (h Handler) GetCities(c echo.Context) error {
+	provinceID := c.QueryParam("province_id")
+	return c.JSON(h.service.GetCities(provinceID))
+}
+
+// @Summary GET Districts
+// @Description Get all districts from RajaOngkir by city ID
+// @Tags Shipping
+// @Accept json
+// @Produce json
+// @Param city_id path string true "City ID"
+// @Success 200 {object} res.ErrorConstant
+// @Failure 400 {object} res.ErrorConstant
+// @Router /shipping/districts/{city_id} [get]
+func (h Handler) GetDistricts(c echo.Context) error {
+	cityID := c.Param("city_id")
+	return c.JSON(h.service.GetDistricts(cityID))
+}

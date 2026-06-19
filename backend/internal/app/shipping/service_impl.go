@@ -2,7 +2,6 @@ package shipping
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/Evanza4s/ecommerce-nw-sbo.git/internal/app/shipping/schemas"
 	"github.com/Evanza4s/ecommerce-nw-sbo.git/internal/model"
@@ -25,22 +24,10 @@ func NewServiceImpl() *ServiceImpl {
 
 func (s ServiceImpl) GetRates(req *schemas.ShippingRatesRequest) (int, interface{}) {
 	destCityID := req.Destination
-	// Check if destination is city name (non-numeric)
-	if _, err := strconv.Atoi(destCityID); err != nil {
-		if resolvedID, err := rajaongkir.GetCityIDByName(destCityID); err == nil && resolvedID != "" {
-			destCityID = resolvedID
-		} else {
-			destCityID = "114" // fallback to Denpasar
-		}
-	}
-
 	originCityID := req.Origin
-	if _, err := strconv.Atoi(originCityID); err != nil {
-		if resolvedID, err := rajaongkir.GetCityIDByName(originCityID); err == nil && resolvedID != "" {
-			originCityID = resolvedID
-		} else {
-			originCityID = "153" // fallback to Jakarta Selatan
-		}
+	// With Komerce we expect these to be district IDs directly without name-resolution fallbacks.
+	if originCityID == "" {
+		originCityID = "423" // Fallback origin if somehow empty
 	}
 
 	roReq := &rajaongkir.CostRequest{
@@ -97,4 +84,28 @@ func (s ServiceImpl) GetAllPagination(payload *model.JwtPayload, req *schemas.Ge
 	}
 
 	return res.BuildCustomResponsePagination(res.StatusSuccess, http.StatusOK, nil, "Successfully fetched shippings", shippings, pageInfo)
+}
+
+func (s ServiceImpl) GetProvinces() (int, interface{}) {
+	provinces, err := rajaongkir.GetProvinces()
+	if err != nil {
+		return res.BuildCustomResponse(res.StatusFailed, http.StatusBadRequest, []string{err.Error()}, "Failed to get provinces", nil)
+	}
+	return res.BuildCustomResponse(res.StatusSuccess, http.StatusOK, nil, "Successfully got provinces", provinces)
+}
+
+func (s ServiceImpl) GetCities(provinceID string) (int, interface{}) {
+	cities, err := rajaongkir.GetCities(provinceID)
+	if err != nil {
+		return res.BuildCustomResponse(res.StatusFailed, http.StatusBadRequest, []string{err.Error()}, "Failed to get cities", nil)
+	}
+	return res.BuildCustomResponse(res.StatusSuccess, http.StatusOK, nil, "Successfully got cities", cities)
+}
+
+func (s ServiceImpl) GetDistricts(cityID string) (int, interface{}) {
+	districts, err := rajaongkir.GetDistricts(cityID)
+	if err != nil {
+		return res.BuildCustomResponse(res.StatusFailed, http.StatusBadRequest, []string{err.Error()}, "Failed to get districts", nil)
+	}
+	return res.BuildCustomResponse(res.StatusSuccess, http.StatusOK, nil, "Successfully got districts", districts)
 }
