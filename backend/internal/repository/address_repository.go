@@ -5,10 +5,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// ============================================================
-// ADDRESS REPOSITORY INTERFACE
-// ============================================================
-
 type AddressRepository interface {
 	// Query
 	FindByID(id uuid.UUID) (*model.MstAddress, error)
