@@ -47,6 +47,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        env:
+          NEXT_PUBLIC_API_URL: "http://localhost:8080"
 
       - name: Setup Node
         uses: actions/setup-node@v4
