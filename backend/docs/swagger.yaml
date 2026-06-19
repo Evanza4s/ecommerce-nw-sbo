@@ -1,4 +1,2680 @@
+basePath: /
+definitions:
+  res.ErrorConstant:
+    properties:
+      code:
+        type: integer
+      data: {}
+      error_fields:
+        items:
+          $ref: '#/definitions/res.Message'
+        type: array
+      message:
+        type: string
+      status:
+        type: boolean
+    type: object
+  res.Message:
+    properties:
+      field:
+        type: string
+      message:
+        type: string
+    type: object
+  res.ResponsePageConstant:
+    properties:
+      code:
+        type: integer
+      data: {}
+      error_fields:
+        items:
+          $ref: '#/definitions/res.Message'
+        type: array
+      message:
+        type: string
+      pagination:
+        $ref: '#/definitions/utils.PaginationInfoDTO'
+      status:
+        type: boolean
+    type: object
+  schemas.AddToCartRequest:
+    properties:
+      product_variant_id:
+        type: string
+      quantity:
+        minimum: 1
+        type: integer
+    required:
+    - product_variant_id
+    - quantity
+    type: object
+  schemas.ChangePassword:
+    properties:
+      confirm_password:
+        type: string
+      current_password:
+        type: string
+      new_password:
+        maxLength: 72
+        minLength: 8
+        type: string
+    required:
+    - confirm_password
+    - current_password
+    - new_password
+    type: object
+  schemas.CheckoutRequest:
+    properties:
+      address_id:
+        type: string
+      courier:
+        description: e.g., jne, pos, tiki
+        type: string
+      shipping_service:
+        description: e.g., REG, OKE
+        type: string
+    required:
+    - address_id
+    - courier
+    - shipping_service
+    type: object
+  schemas.CreateAddress:
+    properties:
+      address_label:
+        type: string
+      city:
+        type: string
+      district:
+        type: string
+      full_address:
+        type: string
+      is_default:
+        type: boolean
+      latitude:
+        type: number
+      longitude:
+        type: number
+      phone_number:
+        type: string
+      postal_code:
+        type: string
+      province:
+        type: string
+      receiver_name:
+        type: string
+      village:
+        type: string
+    required:
+    - city
+    - district
+    - full_address
+    - phone_number
+    - postal_code
+    - province
+    - receiver_name
+    type: object
+  schemas.CreateProduct:
+    properties:
+      brand:
+        maxLength: 100
+        type: string
+      category_id:
+        type: string
+      description:
+        type: string
+      discount_price:
+        minimum: 0
+        type: number
+      gender:
+        enum:
+        - male
+        - female
+        - unisex
+        type: string
+      is_active:
+        type: boolean
+      material:
+        maxLength: 150
+        type: string
+      price:
+        type: number
+      product_name:
+        maxLength: 255
+        minLength: 3
+        type: string
+      product_slug:
+        maxLength: 255
+        type: string
+      seo_description:
+        type: string
+      seo_title:
+        maxLength: 255
+        type: string
+      specifications:
+        items:
+          $ref: '#/definitions/schemas.CreateProductSpecification'
+        type: array
+      status:
+        enum:
+        - active
+        - draft
+        - archived
+        type: string
+      stock:
+        minimum: 0
+        type: integer
+      variants:
+        items:
+          $ref: '#/definitions/schemas.CreateProductVariant'
+        type: array
+      weight:
+        minimum: 0
+        type: number
+    required:
+    - category_id
+    - price
+    - product_name
+    type: object
+  schemas.CreateProductSpecification:
+    properties:
+      spec_name:
+        type: string
+      spec_value:
+        type: string
+    required:
+    - spec_name
+    - spec_value
+    type: object
+  schemas.CreateProductVariant:
+    properties:
+      barcode:
+        type: string
+      color:
+        type: string
+      is_active:
+        type: boolean
+      price_adjustment:
+        type: number
+      size:
+        type: string
+      sku:
+        type: string
+      stock:
+        type: integer
+      weight:
+        type: number
+    type: object
+  schemas.CreateUser:
+    properties:
+      email:
+        type: string
+      fullname:
+        type: string
+      is_active:
+        type: boolean
+      password:
+        maxLength: 72
+        minLength: 8
+        type: string
+      role_id:
+        type: string
+      username:
+        maxLength: 100
+        minLength: 3
+        type: string
+    required:
+    - email
+    - fullname
+    - password
+    - role_id
+    - username
+    type: object
+  schemas.FAQRequest:
+    properties:
+      answer:
+        type: string
+      is_active:
+        type: boolean
+      question:
+        type: string
+      sort_order:
+        type: integer
+    required:
+    - answer
+    - question
+    type: object
+  schemas.ForgotPasswordRequest:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
+  schemas.ForgotPasswordVerifyRequest:
+    properties:
+      confirm_password:
+        type: string
+      email:
+        type: string
+      new_password:
+        minLength: 8
+        type: string
+      otp_code:
+        type: string
+    required:
+    - confirm_password
+    - email
+    - new_password
+    - otp_code
+    type: object
+  schemas.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      rememberMe:
+        type: boolean
+    required:
+    - email
+    - password
+    type: object
+  schemas.LogoutRequest:
+    properties:
+      allDevices:
+        description: logout from all devices
+        type: boolean
+    type: object
+  schemas.RefreshTokenRequest:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  schemas.RegisterRequest:
+    properties:
+      confirmPassword:
+        type: string
+      email:
+        type: string
+      firstName:
+        type: string
+      lastName:
+        type: string
+      password:
+        maxLength: 72
+        minLength: 8
+        type: string
+      username:
+        maxLength: 100
+        minLength: 3
+        type: string
+    required:
+    - confirmPassword
+    - email
+    - firstName
+    - lastName
+    - password
+    - username
+    type: object
+  schemas.RequestCategory:
+    properties:
+      icon:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      slug:
+        type: string
+    required:
+    - name
+    - slug
+    type: object
+  schemas.RequestRoles:
+    properties:
+      is_admin:
+        type: boolean
+      is_superadmin:
+        type: boolean
+      role_name:
+        type: string
+    required:
+    - role_name
+    type: object
+  schemas.ResendOTPRequest:
+    properties:
+      email:
+        type: string
+      otp_type:
+        enum:
+        - verification
+        - forgot_password
+        type: string
+    required:
+    - email
+    - otp_type
+    type: object
+  schemas.ShippingRatesRequest:
+    properties:
+      courier:
+        description: jne, pos, tiki
+        type: string
+      destination:
+        description: City ID from rajaongkir
+        type: string
+      origin:
+        description: City ID from rajaongkir
+        type: string
+      weight:
+        description: in grams
+        minimum: 1
+        type: integer
+    required:
+    - courier
+    - destination
+    - origin
+    - weight
+    type: object
+  schemas.UpdateAddress:
+    properties:
+      address_label:
+        type: string
+      city:
+        type: string
+      district:
+        type: string
+      full_address:
+        type: string
+      is_default:
+        type: boolean
+      latitude:
+        type: number
+      longitude:
+        type: number
+      phone_number:
+        type: string
+      postal_code:
+        type: string
+      province:
+        type: string
+      receiver_name:
+        type: string
+      village:
+        type: string
+    type: object
+  schemas.UpdateCartItemRequest:
+    properties:
+      quantity:
+        minimum: 1
+        type: integer
+    required:
+    - quantity
+    type: object
+  schemas.UpdateIdentity:
+    properties:
+      avatar_url:
+        type: string
+      birth_date:
+        type: string
+      birth_place:
+        type: string
+      first_name:
+        type: string
+      gender:
+        type: string
+      last_name:
+        type: string
+      phone_number:
+        type: string
+    type: object
+  schemas.UpdateProduct:
+    properties:
+      brand:
+        maxLength: 100
+        type: string
+      category_id:
+        type: string
+      description:
+        type: string
+      discount_price:
+        minimum: 0
+        type: number
+      gender:
+        enum:
+        - male
+        - female
+        - unisex
+        type: string
+      is_active:
+        type: boolean
+      material:
+        maxLength: 150
+        type: string
+      price:
+        type: number
+      product_name:
+        maxLength: 255
+        minLength: 3
+        type: string
+      product_slug:
+        maxLength: 255
+        type: string
+      seo_description:
+        type: string
+      seo_title:
+        maxLength: 255
+        type: string
+      status:
+        enum:
+        - active
+        - draft
+        - archived
+        type: string
+      stock:
+        minimum: 0
+        type: integer
+      weight:
+        minimum: 0
+        type: number
+    type: object
+  schemas.UpdateProductVariant:
+    properties:
+      barcode:
+        type: string
+      color:
+        type: string
+      is_active:
+        type: boolean
+      price_adjustment:
+        type: number
+      size:
+        type: string
+      sku:
+        type: string
+      stock:
+        type: integer
+      weight:
+        type: number
+    type: object
+  schemas.UpdateProfile:
+    properties:
+      fullname:
+        type: string
+      username:
+        maxLength: 100
+        minLength: 3
+        type: string
+    type: object
+  schemas.UpdateStatus:
+    properties:
+      is_active:
+        type: boolean
+    required:
+    - is_active
+    type: object
+  schemas.UpdateUser:
+    properties:
+      email:
+        type: string
+      fullname:
+        type: string
+      is_active:
+        type: boolean
+      is_verified:
+        type: boolean
+      role_id:
+        type: string
+      username:
+        maxLength: 100
+        minLength: 3
+        type: string
+    type: object
+  schemas.VerifyOTPRequest:
+    properties:
+      email:
+        type: string
+      otp_code:
+        type: string
+      otp_type:
+        enum:
+        - verification
+        - forgot_password
+        type: string
+    required:
+    - email
+    - otp_code
+    - otp_type
+    type: object
+  utils.PaginationInfoDTO:
+    properties:
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+host: localhost:8080
 info:
   contact: {}
-paths: {}
+  description: E-Commerce NW SBO Backend API
+  title: E-Commerce NW API
+  version: "1.0"
+paths:
+  /addresses/{id}/addresses:
+    get:
+      consumes:
+      - application/json
+      description: Get all addresses for a specific user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: GET User Addresses
+      tags:
+      - Addresses
+    post:
+      consumes:
+      - application/json
+      description: Create a new address for a user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Address data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreateAddress'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: POST User Address
+      tags:
+      - Addresses
+  /addresses/{id}/addresses/{address_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an address for a user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Address ID
+        in: path
+        name: address_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: DELETE User Address
+      tags:
+      - Addresses
+    get:
+      consumes:
+      - application/json
+      description: Get a specific address by ID for a user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Address ID
+        in: path
+        name: address_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: GET User Address by ID
+      tags:
+      - Addresses
+    put:
+      consumes:
+      - application/json
+      description: Update an existing address for a user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Address ID
+        in: path
+        name: address_id
+        required: true
+        type: string
+      - description: Address data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UpdateAddress'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: PUT User Address
+      tags:
+      - Addresses
+  /addresses/{id}/addresses/{address_id}/default:
+    put:
+      consumes:
+      - application/json
+      description: Set an address as the default address for a user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Address ID
+        in: path
+        name: address_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: PUT Set Default Address
+      tags:
+      - Addresses
+  /auth/forgot-password:
+    post:
+      consumes:
+      - application/json
+      description: Send OTP for password reset
+      parameters:
+      - description: Email
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.ForgotPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: POST Forgot Password
+      tags:
+      - Auth
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login with email and password
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: POST Login
+      tags:
+      - Auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout and revoke session
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Logout options
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/schemas.LogoutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: POST Logout
+      tags:
+      - Auth
+  /auth/refresh-token:
+    post:
+      consumes:
+      - application/json
+      description: Refresh access token using refresh token
+      parameters:
+      - description: Refresh token
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: POST Refresh Token
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user account and send verification OTP
+      parameters:
+      - description: Registration data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: POST Register
+      tags:
+      - Auth
+  /auth/resend-otp:
+    post:
+      consumes:
+      - application/json
+      description: Resend OTP code to email
+      parameters:
+      - description: Resend OTP data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.ResendOTPRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: POST Resend OTP
+      tags:
+      - Auth
+  /auth/reset-password:
+    post:
+      consumes:
+      - application/json
+      description: Reset password using OTP code
+      parameters:
+      - description: Password reset data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.ForgotPasswordVerifyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: POST Reset Password with OTP
+      tags:
+      - Auth
+  /auth/sessions:
+    get:
+      consumes:
+      - application/json
+      description: Get all active sessions for current user
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: GET Sessions
+      tags:
+      - Auth
+  /auth/sessions/{session_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Revoke a specific session
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Session ID
+        in: path
+        name: session_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: DELETE Session
+      tags:
+      - Auth
+  /auth/verify-otp:
+    post:
+      consumes:
+      - application/json
+      description: Verify OTP code for email verification or password reset
+      parameters:
+      - description: OTP verification data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.VerifyOTPRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: POST Verify OTP
+      tags:
+      - Auth
+  /carts:
+    delete:
+      consumes:
+      - application/json
+      description: Remove all items from cart
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      security:
+      - BearerAuth: []
+      summary: DELETE Clear Cart
+      tags:
+      - Carts
+    get:
+      consumes:
+      - application/json
+      description: Get current logged-in user cart
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      security:
+      - BearerAuth: []
+      summary: GET User Cart
+      tags:
+      - Carts
+  /carts/items:
+    post:
+      consumes:
+      - application/json
+      description: Add product variant to cart
+      parameters:
+      - description: Add To Cart Data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.AddToCartRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      security:
+      - BearerAuth: []
+      summary: POST Add To Cart
+      tags:
+      - Carts
+  /carts/items/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove item from cart
+      parameters:
+      - description: Cart Item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      security:
+      - BearerAuth: []
+      summary: DELETE Cart Item
+      tags:
+      - Carts
+    put:
+      consumes:
+      - application/json
+      description: Update quantity of cart item
+      parameters:
+      - description: Cart Item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update Cart Item Data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UpdateCartItemRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      security:
+      - BearerAuth: []
+      summary: PUT Update Cart Item
+      tags:
+      - Carts
+  /categories:
+    get:
+      consumes:
+      - application/json
+      description: Get all categories without pagination
+      parameters:
+      - description: name Category
+        in: query
+        name: name
+        type: string
+      - description: slug Category
+        in: query
+        name: slug
+        type: string
+      - description: icon Category
+        in: query
+        name: icon
+        type: string
+      - description: is_active Category
+        in: query
+        name: is_active
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: GET Category
+      tags:
+      - Category
+    post:
+      consumes:
+      - application/json
+      description: Create a new category
+      parameters:
+      - description: request body Create Category
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.RequestCategory'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: POST Category
+      tags:
+      - Category
+  /categories/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete category by ID
+      parameters:
+      - description: Id Category
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: DELETE Category
+      tags:
+      - Category
+    get:
+      consumes:
+      - application/json
+      description: Get category by ID
+      parameters:
+      - description: Id Category
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: GET Category by ID
+      tags:
+      - Category
+    put:
+      consumes:
+      - application/json
+      description: Update category by ID
+      parameters:
+      - description: Id Category
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: request body Update Category
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.RequestCategory'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: PUT Category
+      tags:
+      - Category
+  /categories/get-all:
+    get:
+      consumes:
+      - application/json
+      description: Get all categories with pagination
+      parameters:
+      - description: name Category
+        in: query
+        name: name
+        type: string
+      - description: slug Category
+        in: query
+        name: slug
+        type: string
+      - description: icon Category
+        in: query
+        name: icon
+        type: string
+      - description: is_active Category
+        in: query
+        name: is_active
+        type: boolean
+      - default: 1
+        description: page
+        in: query
+        name: page
+        required: true
+        type: integer
+      - default: 10
+        description: page size
+        in: query
+        name: page_size
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ResponsePageConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: GET Category All
+      tags:
+      - Category
+  /faq:
+    get:
+      consumes:
+      - application/json
+      description: Get all faq without pagination
+      parameters:
+      - description: question FAQ
+        in: query
+        name: question
+        type: string
+      - description: answer FAQ
+        in: query
+        name: answer
+        type: string
+      - description: sort_order FAQ
+        in: query
+        name: sort_order
+        type: string
+      - description: is_active FAQ
+        in: query
+        name: is_active
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: GET FAQ
+      tags:
+      - FAQ
+    post:
+      consumes:
+      - application/json
+      description: Create a new FAQ
+      parameters:
+      - description: request body Create FAQ
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.FAQRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: POST FAQ
+      tags:
+      - FAQ
+  /faq/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete FAQ by ID
+      parameters:
+      - description: Id FAQ
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: DELETE FAQ
+      tags:
+      - FAQ
+    put:
+      consumes:
+      - application/json
+      description: Update FAQ by ID
+      parameters:
+      - description: Id FAQ
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: request body Update FAQ
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.FAQRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: PUT FAQ
+      tags:
+      - FAQ
+  /faq/{question}:
+    get:
+      consumes:
+      - application/json
+      description: Get FAQ by ID
+      parameters:
+      - description: question FAQ
+        in: path
+        name: question
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: GET FAQ by ID
+      tags:
+      - FAQ
+  /faq/get-all:
+    get:
+      consumes:
+      - application/json
+      description: Get all faq with pagination
+      parameters:
+      - description: question FAQ
+        in: query
+        name: question
+        type: string
+      - description: answer FAQ
+        in: query
+        name: answer
+        type: string
+      - description: sort_order FAQ
+        in: query
+        name: sort_order
+        type: string
+      - description: is_active FAQ
+        in: query
+        name: is_active
+        type: boolean
+      - default: 1
+        description: page
+        in: query
+        name: page
+        required: true
+        type: integer
+      - default: 10
+        description: page size
+        in: query
+        name: page_size
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ResponsePageConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: GET FAQ All
+      tags:
+      - FAQ
+  /orders/checkout:
+    post:
+      consumes:
+      - application/json
+      description: Checkout cart items
+      parameters:
+      - description: Checkout Data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CheckoutRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      security:
+      - BearerAuth: []
+      summary: POST Checkout
+      tags:
+      - Orders
+  /payments/webhook:
+    post:
+      consumes:
+      - application/json
+      description: Receive payment notifications
+      produces:
+      - application/json
+      responses: {}
+      summary: POST Midtrans Webhook
+      tags:
+      - Payments
+  /products:
+    get:
+      consumes:
+      - application/json
+      description: Get paginated list of products with optional filters
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - default: 12
+        description: Page size
+        in: query
+        name: page_size
+        required: true
+        type: integer
+      - description: Search by name or brand
+        in: query
+        name: search
+        type: string
+      - description: Filter by category UUID
+        in: query
+        name: category_id
+        type: string
+      - description: Filter by brand
+        in: query
+        name: brand
+        type: string
+      - description: Filter by gender (male|female|unisex)
+        in: query
+        name: gender
+        type: string
+      - description: Filter by status (active|draft|archived)
+        in: query
+        name: status
+        type: string
+      - description: Minimum price
+        in: query
+        name: min_price
+        type: number
+      - description: Maximum price
+        in: query
+        name: max_price
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ResponsePageConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: GET Products (paginated)
+      tags:
+      - Products
+  /products/{slug}:
+    get:
+      consumes:
+      - application/json
+      description: Get product detail by slug (public)
+      parameters:
+      - description: Product Slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: GET Product by Slug
+      tags:
+      - Products
+  /products/admin:
+    post:
+      consumes:
+      - application/json
+      description: Create a new product with optional variants and specifications
+      parameters:
+      - description: Product data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreateProduct'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      security:
+      - BearerAuth: []
+      summary: POST Create Product (Admin)
+      tags:
+      - Products
+  /products/admin/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete a product
+      parameters:
+      - description: Product ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      security:
+      - BearerAuth: []
+      summary: DELETE Product (Admin)
+      tags:
+      - Products
+    get:
+      consumes:
+      - application/json
+      description: Get product detail by ID
+      parameters:
+      - description: Product ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      security:
+      - BearerAuth: []
+      summary: GET Product by ID (Admin)
+      tags:
+      - Products
+    put:
+      consumes:
+      - application/json
+      description: Update an existing product
+      parameters:
+      - description: Product ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Product data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UpdateProduct'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      security:
+      - BearerAuth: []
+      summary: PUT Update Product (Admin)
+      tags:
+      - Products
+  /products/admin/{id}/images:
+    get:
+      consumes:
+      - application/json
+      description: Get all images for a product
+      parameters:
+      - description: Product ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      security:
+      - BearerAuth: []
+      summary: GET Product Images (Admin)
+      tags:
+      - Products
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload product image to Cloudinary and save URL to DB
+      parameters:
+      - description: Product ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Image file (jpg, png, webp, gif, bmp)
+        in: formData
+        name: image
+        required: true
+        type: file
+      - description: 'Set as thumbnail (default: false)'
+        in: formData
+        name: is_thumbnail
+        type: boolean
+      - description: 'Sort order (default: 0)'
+        in: formData
+        name: sort_order
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      security:
+      - BearerAuth: []
+      summary: POST Upload Product Image (Admin)
+      tags:
+      - Products
+  /products/admin/{id}/images/{image_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a product image from DB and Cloudinary
+      parameters:
+      - description: Product ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Image ID (UUID)
+        in: path
+        name: image_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      security:
+      - BearerAuth: []
+      summary: DELETE Product Image (Admin)
+      tags:
+      - Products
+  /products/admin/{id}/images/{image_id}/thumbnail:
+    put:
+      consumes:
+      - application/json
+      description: Set a specific image as the product thumbnail
+      parameters:
+      - description: Product ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Image ID (UUID)
+        in: path
+        name: image_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      security:
+      - BearerAuth: []
+      summary: PUT Set Thumbnail Image (Admin)
+      tags:
+      - Products
+  /products/admin/{id}/specifications:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Product ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Spec data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreateProductSpecification'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      security:
+      - BearerAuth: []
+      summary: POST Create Specification (Admin)
+      tags:
+      - Products
+  /products/admin/{id}/specifications/{spec_id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Product ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Specification ID (UUID)
+        in: path
+        name: spec_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      security:
+      - BearerAuth: []
+      summary: DELETE Specification (Admin)
+      tags:
+      - Products
+  /products/admin/{id}/variants:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Product ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Variant data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreateProductVariant'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      security:
+      - BearerAuth: []
+      summary: POST Create Variant (Admin)
+      tags:
+      - Products
+  /products/admin/{id}/variants/{variant_id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Product ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Variant ID (UUID)
+        in: path
+        name: variant_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      security:
+      - BearerAuth: []
+      summary: DELETE Variant (Admin)
+      tags:
+      - Products
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Product ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Variant ID (UUID)
+        in: path
+        name: variant_id
+        required: true
+        type: string
+      - description: Variant data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UpdateProductVariant'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      security:
+      - BearerAuth: []
+      summary: PUT Update Variant (Admin)
+      tags:
+      - Products
+  /roles:
+    get:
+      consumes:
+      - application/json
+      description: Get all roles without pagination
+      parameters:
+      - description: name roles
+        in: query
+        name: role_name
+        type: string
+      - description: is admin roles
+        in: query
+        name: is_admin
+        type: boolean
+      - description: is super admin roles
+        in: query
+        name: is_superadmin
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: GET Roles
+      tags:
+      - Roles
+    post:
+      consumes:
+      - application/json
+      description: Create a new Roles
+      parameters:
+      - description: request body Create Roles
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.RequestRoles'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: POST Roles
+      tags:
+      - Roles
+  /roles/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Roles by ID
+      parameters:
+      - description: Id Roles
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: DELETE Roles
+      tags:
+      - Roles
+    put:
+      consumes:
+      - application/json
+      description: Update Roles by ID
+      parameters:
+      - description: Id Roles
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: request body Update Roles
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.RequestRoles'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: PUT Roles
+      tags:
+      - Roles
+  /roles/get-all:
+    get:
+      consumes:
+      - application/json
+      description: Get all roles with pagination
+      parameters:
+      - description: name roles
+        in: query
+        name: role_name
+        type: string
+      - description: is admin roles
+        in: query
+        name: is_admin
+        type: boolean
+      - description: is super admin roles
+        in: query
+        name: is_superadmin
+        type: boolean
+      - default: 1
+        description: page
+        in: query
+        name: page
+        required: true
+        type: integer
+      - default: 10
+        description: page size
+        in: query
+        name: page_size
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ResponsePageConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: GET Roles All
+      tags:
+      - Roles
+  /shipping/rates:
+    post:
+      consumes:
+      - application/json
+      description: Get shipping rates
+      parameters:
+      - description: Shipping Rates Data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.ShippingRatesRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: POST Shipping Rates
+      tags:
+      - Shipping
+  /user-identities/{id}/avatar:
+    delete:
+      consumes:
+      - application/json
+      description: Delete user avatar image
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: DELETE Avatar
+      tags:
+      - User Identity
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload user avatar image
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Avatar image file
+        in: formData
+        name: avatar
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: POST Upload Avatar
+      tags:
+      - User Identity
+  /user-identities/{id}/identity:
+    get:
+      consumes:
+      - application/json
+      description: Get user identity by user ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: GET User Identity
+      tags:
+      - User Identity
+    put:
+      consumes:
+      - application/json
+      description: Update user identity
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Identity data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UpdateIdentity'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: PUT User Identity
+      tags:
+      - User Identity
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Get all users without pagination
+      parameters:
+      - description: Filter by email
+        in: query
+        name: email
+        type: string
+      - description: Filter by username
+        in: query
+        name: username
+        type: string
+      - description: Filter by active status
+        in: query
+        name: is_active
+        type: boolean
+      - description: Filter by verified status
+        in: query
+        name: is_verified
+        type: boolean
+      - description: Filter by role ID
+        in: query
+        name: role_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: GET Users
+      tags:
+      - Users
+    post:
+      consumes:
+      - application/json
+      description: Create a new user
+      parameters:
+      - description: User data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreateUser'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: POST User
+      tags:
+      - Users
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: DELETE User
+      tags:
+      - Users
+    get:
+      consumes:
+      - application/json
+      description: Get user details by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: GET User by ID
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      description: Update user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UpdateUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: PUT User
+      tags:
+      - Users
+  /users/{id}/change-password:
+    put:
+      consumes:
+      - application/json
+      description: Change user password
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Password data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.ChangePassword'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: PUT Change Password
+      tags:
+      - Users
+  /users/{id}/role/{role_id}:
+    put:
+      consumes:
+      - application/json
+      description: Update user role
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Role ID
+        in: path
+        name: role_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: PUT User Role
+      tags:
+      - Users
+  /users/{id}/status:
+    put:
+      consumes:
+      - application/json
+      description: Update user active status
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Status data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UpdateStatus'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: PUT User Status
+      tags:
+      - Users
+  /users/change-password:
+    put:
+      consumes:
+      - application/json
+      description: Change current logged-in user password
+      parameters:
+      - description: Password data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.ChangePassword'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      security:
+      - BearerAuth: []
+      summary: PUT Change My Password
+      tags:
+      - Users
+  /users/get-all:
+    get:
+      consumes:
+      - application/json
+      description: Get all users with pagination
+      parameters:
+      - description: Filter by email
+        in: query
+        name: email
+        type: string
+      - description: Filter by username
+        in: query
+        name: username
+        type: string
+      - description: Filter by active status
+        in: query
+        name: is_active
+        type: boolean
+      - description: Filter by verified status
+        in: query
+        name: is_verified
+        type: boolean
+      - description: Filter by role ID
+        in: query
+        name: role_id
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - default: 10
+        description: Page size
+        in: query
+        name: page_size
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ResponsePageConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      summary: GET Users All
+      tags:
+      - Users
+  /users/profile:
+    get:
+      consumes:
+      - application/json
+      description: Get current logged-in user profile
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      security:
+      - BearerAuth: []
+      summary: GET My Profile
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      description: Update current logged-in user profile
+      parameters:
+      - description: Profile data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UpdateProfile'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/res.ErrorConstant'
+      security:
+      - BearerAuth: []
+      summary: PUT Update My Profile
+      tags:
+      - Users
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

@@ -1,41 +1,111 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"os"
+	"strings"
 
-	echoSwagger "github.com/swaggo/echo-swagger/v2"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"github.com/sirupsen/logrus"
 
+	"github.com/Evanza4s/ecommerce-nw-sbo.git/db"
 	_ "github.com/Evanza4s/ecommerce-nw-sbo.git/docs"
-	"github.com/labstack/echo/v5"
-	"github.com/labstack/echo/v5/middleware"
+	"github.com/Evanza4s/ecommerce-nw-sbo.git/internal/routes"
+	"github.com/Evanza4s/ecommerce-nw-sbo.git/pkg/mail"
+	"github.com/Evanza4s/ecommerce-nw-sbo.git/pkg/redis"
+	"github.com/Evanza4s/ecommerce-nw-sbo.git/pkg/util"
+	"github.com/Evanza4s/ecommerce-nw-sbo.git/pkg/util/cloud"
+	"github.com/Evanza4s/ecommerce-nw-sbo.git/pkg/util/crypto"
+	"github.com/Evanza4s/ecommerce-nw-sbo.git/pkg/util/midtrans"
 )
 
-// @title Swagger Example API
+// @title E-Commerce NW API
 // @version 1.0
-// @description This is a sample server Petstore server.
-// @termsOfService http://swagger.io/terms/
+// @description E-Commerce NW SBO Backend API
+// @host localhost:8080
+// @BasePath /
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 
-// @contact.name API Support
-// @contact.url http://www.swagger.io/support
-// @contact.email support@swagger.io
-
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host petstore.swagger.io
-// @BasePath /v2
+func init() {
+	ENV := os.Getenv("ENV")
+	env := util.NewEnv()
+	env.Load(ENV)
+	logrus.Info("choose environment " + ENV)
+}
 
 func main() {
+	var (
+		APP  = os.Getenv("APP")
+		ENV  = os.Getenv("ENV")
+		PORT = os.Getenv("PORT")
+		NAME = fmt.Sprintf("%s-%s", APP, ENV)
+	)
+
+	// Initialize Database
+	db.Init()
+
+	// Initialize Crypto
+	crypto.Init()
+
+	// Initialize Redis
+	if err := redis.Init(); err != nil {
+		logrus.Warn("Redis init failed: ", err)
+	} else {
+		logrus.Info("Redis connected successfully")
+	}
+	defer redis.Close()
+
+	// Initialize Cloudinary
+	if err := cloud.InitCloudinary(); err != nil {
+		logrus.Warn("Cloudinary init failed: ", err)
+	}
+
+	// Initialize Midtrans
+	midtrans.InitMidtrans()
+
+	// Initialize Mail Service
+	if err := mail.Init(); err != nil {
+		logrus.Warn("Mail service init failed: ", err)
+	}
+
 	e := echo.New()
-	e.Use(middleware.RequestLogger())
 
-	e.GET("/", func(c *echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
-	})
+	e.Use(
+		middleware.Recover(),
+		middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowOriginFunc: func(origin string) (bool, error) {
+				allowed := []string{"http://localhost:3000", "http://localhost:8080"}
+				// Load extra origins from env (e.g. ngrok URLs)
+				if extra := os.Getenv("CORS_ORIGINS"); extra != "" {
+					allowed = append(allowed, strings.Split(extra, ",")...)
+				}
+				for _, o := range allowed {
+					if strings.TrimSpace(o) == origin {
+						return true, nil
+					}
+				}
+				return false, nil
+			},
+			AllowMethods:     []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete, http.MethodOptions, http.MethodPatch},
+			AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
+			AllowCredentials: true,
+		}),
+		middleware.LoggerWithConfig(middleware.LoggerConfig{
+			Format: fmt.Sprintf("\n%s | ${host} | ${time_custom} | ${status} | ${latency_human} | ${remote_ip} | ${method} | ${uri}",
+				NAME,
+			),
+			CustomTimeFormat: "2006/01/02 15:04:05",
+			Output:           os.Stdout,
+		}),
+	)
 
-	e.GET("/swagger/*", echoSwagger.WrapHandler)
+	routes.Init(e.Group(""))
 
-	if err := e.Start(":1323"); err != nil {
-		e.Logger.Error("failed to start server", "error", err)
+	if err := e.Start(":" + PORT); err != nil {
+		logrus.Fatal("failed to start server: ", err)
 	}
 }
