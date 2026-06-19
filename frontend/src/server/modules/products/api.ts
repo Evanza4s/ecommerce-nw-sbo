@@ -18,11 +18,9 @@ import type {
   CategoryListResponse,
   CreateCategoryRequest,
   UpdateCategoryRequest,
+  ApiPagination,
 } from './types';
 
-// ============================================================
-// HELPER — build query string from filters (skip undefined/empty)
-// ============================================================
 
 function buildQuery(params: Record<string, any>): string {
   const q = new URLSearchParams();
@@ -91,7 +89,7 @@ export const adminProductsApi = {
     form.append('image', file);
     if (isThumbnail) form.append('is_thumbnail', 'true');
     if (sortOrder !== undefined) form.append('sort_order', sortOrder.toString());
-    
+
     return postApi<AuthResponse<ProductImageUploadResponse>>(
       `/products/admin/${productId}/images`,
       form,

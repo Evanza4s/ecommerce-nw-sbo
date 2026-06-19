@@ -80,7 +80,22 @@ export default function AddressesPage() {
         await userApi.address.update(user.id, editingAddress.id, values);
         toast.success("Alamat berhasil diperbarui");
       } else {
-        await userApi.address.create(user.id, { ...values, is_default: false });
+        await userApi.address.create(user.id, { 
+          address_label: values.address_label || "",
+          receiver_name: values.receiver_name || "",
+          phone_number: values.phone_number || "",
+          province: values.province || "",
+          city: values.city || "",
+          district: values.district || "",
+          postal_code: values.postal_code || "",
+          full_address: values.full_address,
+          street: "",
+          district_id: "",
+          province_id: "",
+          city_id: "",
+          village: "",
+          is_default: false 
+        });
         toast.success("Alamat baru berhasil ditambahkan");
       }
       setIsDialogOpen(false);
