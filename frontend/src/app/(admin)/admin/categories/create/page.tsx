@@ -1,13 +1,11 @@
+"use client"
 import AdminBreadcrumbs from "@/components/admin/AdminBreadcrumbs";
 import AdminCategoryForm from "@/components/admin/AdminCategoryForm";
 import AdminPageSection from "@/components/ui/AdminPageSection";
 
 const CreateCategoryPage = () => {
   return (
-    <AdminPageSection
-      title="Create Category"
-      description="Tambahkan kategori baru untuk memperjelas pengelompokan produk."
-    >
+    <AdminPageSection title="Create Category" description="Tambahkan kategori produk baru ke dalam sistem.">
       <AdminBreadcrumbs
         items={[
           { label: "Dashboard", href: "/admin" },
@@ -15,7 +13,7 @@ const CreateCategoryPage = () => {
           { label: "Create" },
         ]}
       />
-      <AdminCategoryForm title="New Category" submitLabel="Save Category" />
+      <AdminCategoryForm mode="create" />
     </AdminPageSection>
   );
 };

@@ -1,9 +1,38 @@
 "use client"
 import React, { useState } from 'react';
-import { ShieldCheck, AlertTriangle } from 'lucide-react';
+import { ShieldCheck, AlertTriangle, Loader2 } from 'lucide-react';
+import { ordersApi } from "@/server/modules/orders/api";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
+import { userRoutes } from "@/lib/user-routes";
 
-const VerificationAction = () => {
+interface VerificationActionProps {
+  orderId: string;
+  orderStatus: string;
+  onSuccess: () => void;
+}
+
+const VerificationAction = ({ orderId, orderStatus, onSuccess }: VerificationActionProps) => {
+  const router = useRouter();
   const [isChecked, setIsChecked] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  if (orderStatus === "Delivered") {
+    return null;
+  }
+
+  const handleConfirmReceived = async () => {
+    setIsSubmitting(true);
+    try {
+      await ordersApi.updateStatus(orderId, { order_status: "Delivered" });
+      toast.success("Pesanan berhasil dikonfirmasi diterima!");
+      onSuccess();
+    } catch (err: any) {
+      toast.error(err.message || "Gagal melakukan konfirmasi pesanan.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm mt-6">
@@ -31,17 +60,22 @@ const VerificationAction = () => {
 
       <div className="flex flex-col gap-3">
         <button 
-          disabled={!isChecked}
-          className={`w-full py-3 rounded-xl font-bold transition-all ${
-            isChecked 
-              ? 'bg-green-600 hover:bg-green-700 text-white shadow-md' 
+          disabled={!isChecked || isSubmitting}
+          onClick={handleConfirmReceived}
+          className={`w-full py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 ${
+            isChecked && !isSubmitting
+              ? 'bg-green-600 hover:bg-green-700 text-white shadow-md cursor-pointer' 
               : 'bg-gray-200 text-gray-400 cursor-not-allowed'
           }`}
         >
+          {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
           Ya, Pesanan Telah Diterima
         </button>
         
-        <button className="w-full py-3 rounded-xl font-bold text-red-600 border border-red-200 hover:bg-red-50 transition-all flex items-center justify-center gap-2">
+        <button 
+          onClick={() => router.push(userRoutes.orderRefund(orderId))}
+          className="w-full py-3 rounded-xl font-bold text-red-600 border border-red-200 hover:bg-red-50 transition-all flex items-center justify-center gap-2 cursor-pointer"
+        >
           <AlertTriangle size={18} /> Ajukan Refund / Komplain
         </button>
         <p className="text-center text-xs text-gray-400 mt-1">

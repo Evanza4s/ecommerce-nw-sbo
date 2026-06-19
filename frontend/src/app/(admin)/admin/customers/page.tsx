@@ -2,10 +2,12 @@
 import AdminRowActions from "@/components/admin/AdminRowActions";
 import AdminStatusBadge from "@/components/admin/AdminStatusBadge";
 import AdminTablePage from "@/components/admin/AdminTablePage";
-import { adminCustomers } from "@/data/admin-dashboard";
 import { formatDateTime } from "@/lib/admin";
+import { useAdminCustomers } from "@/hooks/useAdminCustomers";
 
 export default function CustomersPage() {
+  const { customers, loading } = useAdminCustomers();
+
   return (
     <AdminTablePage
       title="Customers"
@@ -14,10 +16,10 @@ export default function CustomersPage() {
         { label: "Dashboard", href: "/admin" },
         { label: "Customers" },
       ]}
-      data={adminCustomers}
+      data={customers}
       getRowKey={(customer) => customer.id}
       searchPlaceholder="Search by customer name or email..."
-      searchBy={(customer) => `${customer.name} ${customer.email} ${customer.phone}`}
+      searchBy={(customer) => `${customer.first_name} ${customer.last_name} ${customer.email} ${customer.phone_number}`}
       filters={[
         {
           label: "Customer Status",
@@ -26,15 +28,14 @@ export default function CustomersPage() {
             { label: "All Status", value: "all" },
             { label: "Active", value: "active" },
             { label: "Inactive", value: "inactive" },
-            { label: "Suspended", value: "suspended" },
           ],
-          getValue: (customer) => customer.status,
+          getValue: (customer) => customer.is_active ? "active" : "inactive",
         },
       ]}
       columns={[
         {
           header: "Name",
-          cell: (customer) => customer.name,
+          cell: (customer) => `${customer.first_name || ''} ${customer.last_name || ''}`.trim() || customer.username,
         },
         {
           header: "Email",
@@ -42,19 +43,23 @@ export default function CustomersPage() {
         },
         {
           header: "Phone",
-          cell: (customer) => customer.phone,
+          cell: (customer) => customer.phone_number || "-",
         },
         {
-          header: "Gender",
-          cell: (customer) => customer.gender,
+          header: "Role",
+          cell: (customer) => customer.role_name || "User",
         },
         {
           header: "Registered",
-          cell: (customer) => formatDateTime(customer.registeredAt),
+          cell: (customer) => formatDateTime(customer.created_at),
         },
         {
           header: "Status",
-          cell: (customer) => <AdminStatusBadge status={customer.status} />,
+          cell: (customer) => <AdminStatusBadge status={customer.is_active ? "active" : "inactive"} />,
+        },
+        {
+          header: "Verified",
+          cell: (customer) => <AdminStatusBadge status={customer.is_verified ? "verified" : "unverified"} />,
         },
         {
           header: "Actions",
@@ -65,16 +70,16 @@ export default function CustomersPage() {
                 actions={[
                   {
                     label: "View History Order",
-                    href: `/admin/customers/${customer.id}`,
+                    href: `/admin/customers/${customer.id}`, // Placeholder
                   },
-                  { label: "Suspend / Ban", href: `/admin/customers/${customer.id}` },
+                  { label: "Suspend / Ban", href: `/admin/customers/${customer.id}` }, // Placeholder
                 ]}
               />
             </div>
           ),
         },
       ]}
-      emptyMessage="No customers found for the current search."
+      emptyMessage={loading ? "Loading customers..." : "No customers found for the current search."}
     />
   );
 }

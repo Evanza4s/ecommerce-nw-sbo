@@ -1,38 +1,54 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useEffect } from "react";
 
-const OtpInput = () => {
-  const [otp, setOtp] = useState(Array(6).fill(""));
+interface OtpInputProps {
+  value?: string;
+  onChange?: (otp: string) => void;
+  length?: number;
+}
 
+const OtpInput = ({ value = "", onChange, length = 6 }: OtpInputProps) => {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  const handleChange = (value: string, index: number) => {
-    if (!/^\d?$/.test(value)) return;
+  const otpArray = value.split("").concat(Array(length).fill("")).slice(0, length);
 
-    const newOtp = [...otp];
+  useEffect(() => {
+    inputRefs.current = inputRefs.current.slice(0, length);
+  }, [length]);
 
-    newOtp[index] = value;
+  const handleChange = (inputValue: string, index: number) => {
+    if (!/^\d?$/.test(inputValue)) return;
 
-    setOtp(newOtp);
+    const newOtp = [...otpArray];
+    newOtp[index] = inputValue;
 
-    if (value && index < inputRefs.current.length - 1) {
+    const otpString = newOtp.join("");
+    onChange?.(otpString);
+
+    if (inputValue && index < length - 1) {
       inputRefs.current[index + 1]?.focus();
     }
   };
 
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
-    index: number,
+    index: number
   ) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
+    if (e.key === "Backspace" && !otpArray[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
   };
 
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, length);
+    onChange?.(pastedData);
+  };
+
   return (
     <div className="flex justify-center gap-3 py-6">
-      {otp.map((digit, index) => (
+      {otpArray.map((digit, index) => (
         <input
           key={index}
           ref={(el) => {
@@ -43,9 +59,8 @@ const OtpInput = () => {
           inputMode="numeric"
           onChange={(e) => handleChange(e.target.value, index)}
           onKeyDown={(e) => handleKeyDown(e, index)}
-          className="
-            h-14 w-14 rounded-lg border border-black/20 bg-background text-center text-xl font-bold outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20
-          "
+          onPaste={handlePaste}
+          className="h-14 w-14 rounded-lg border border-black/20 bg-background text-center text-xl font-bold outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
         />
       ))}
     </div>

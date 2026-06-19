@@ -1,38 +1,38 @@
-import { Package } from 'lucide-react';
+import { Package, Truck, Home } from 'lucide-react';
 import React from 'react'
 
 export const Guide = [
   {
     id: 1,
     icon: Package,
-    title: "Pilih Produk",
-    description: "Pilih produk yang ingin Anda beli dari katalog kami.",
+    title: "Pesanan Dikemas",
+    description: "Pesanan Anda sedang dikemas dengan aman oleh tim kami.",
   },
   {
     id: 2,
-    icon: Package,
-    title: "Masukkan Alamat Pengiriman",
-    description: "Masukkan alamat lengkap tempat Anda ingin barang dikirim.",
+    icon: Truck,
+    title: "Dalam Perjalanan",
+    description: "Pesanan telah diserahkan kepada kurir dan sedang menuju lokasi Anda.",
   },
   {
     id: 3,
-    icon: Package,
-    title: "Terima Barang",
-    description: "Terima barang dan pastikan semua item sesuai dengan pesanan.",
+    icon: Home,
+    title: "Tiba di Tujuan",
+    description: "Pesanan telah sampai di alamat pengiriman dan siap diterima.",
   },
 ];
 
 const ShippingGuideContent = () => {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="grid gap-3 grid-cols-1 w-full">
       {Guide.map((item) => (
-        <div key={item.id} className="flex gap-4 p-4 border rounded-lg">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-            <item.icon size={24} />
+        <div key={item.id} className="group flex flex-row items-center gap-4 p-4 border border-slate-100 bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 hover:border-primary/20 text-left relative overflow-hidden">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/5 text-primary group-hover:scale-110 group-hover:bg-primary/10 transition-transform duration-300">
+            <item.icon size={24} strokeWidth={1.5} />
           </div>
           <div>
-            <h4 className="font-bold text-slate-900">{item.title}</h4>
-            <p className="text-sm text-slate-500">{item.description}</p>
+            <h4 className="font-bold text-slate-800 text-base mb-1">{item.title}</h4>
+            <p className="text-sm text-slate-500 leading-relaxed">{item.description}</p>
           </div>
         </div>
       ))}
@@ -40,4 +40,4 @@ const ShippingGuideContent = () => {
   )
 }
 
-export default ShippingGuideContent
+export default ShippingGuideContent;

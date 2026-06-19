@@ -1,17 +1,18 @@
 import React from 'react'
 
-const OrderNote = () => {
+interface OrderNoteProps {
+  notes?: string;
+}
+
+const OrderNote = ({ notes }: OrderNoteProps) => {
   return (
-    <div className='rounded-2xl border p-5'>
-        <h3 className='mb-4 font-bold'>
+    <div className='rounded-2xl border p-5 bg-white shadow-sm'>
+        <h3 className='mb-2 font-bold'>
             Order Note
         </h3>
-
-        <textarea 
-        rows={8}
-        className='w-full rounded-lg border px-3 py-2 placeholder:text-primary-ghost/40 focus:outline-none focus:ring-2 focus:ring-primary'
-        placeholder='Add note to your order...'
-        />
+        <p className='text-sm text-dark/70 leading-relaxed whitespace-pre-line'>
+            {notes || "Tidak ada catatan untuk pesanan ini."}
+        </p>
     </div>
   )
 }

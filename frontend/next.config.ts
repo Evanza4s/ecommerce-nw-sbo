@@ -10,6 +10,18 @@ type WebpackRule = {
 
 const nextConfig: NextConfig = {
   turbopack: {},
+    images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "placehold.co",
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
+    ],
+  },
   webpack(config) {
     // 1. Cari aturan bawaan Next.js untuk file SVG
     const fileLoaderRule = config.module.rules.find((rule: WebpackRule) =>

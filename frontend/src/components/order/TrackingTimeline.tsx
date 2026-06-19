@@ -1,45 +1,63 @@
 import React from "react";
 import { Copy, Package, Check, AlertCircle } from "lucide-react";
+import { formatDate } from "@/lib/admin";
+import type { Order } from "@/server/modules/orders/types";
+import { toast } from "react-toastify";
 
-const timelineData = [
-  {
-    status: "pending",
-    title: "Diterima Pelanggan",
-    description: "Paket akan diserahkan kepada penerima.",
-    date: "-",
-    time: "-",
-  },
-  {
-    status: "active",
-    title: "Dalam Pengiriman",
-    description: "Kurir (Budi) sedang mengantar paket ke alamat tujuan Anda.",
-    date: "16 Mei 2026",
-    time: "08:15",
-  },
-  {
-    status: "completed",
-    title: "Paket Diterima Di Hub",
-    description: "Paket telah sampai di fasilitas logistik lokal (Bandung).",
-    date: "15 Mei 2026",
-    time: "20:00",
-  },
-  {
-    status: "completed",
-    title: "Paket Dikirim",
-    description: "Paket sedang dalam perjalanan antar kota dari Jakarta.",
-    date: "15 Mei 2026",
-    time: "14:00",
-  },
-  {
-    status: "completed",
-    title: "Pesanan Dibuat",
-    description: "Pesanan telah dikonfirmasi dan disiapkan oleh penjual.",
-    date: "14 Mei 2026",
-    time: "10:00",
-  },
-];
+interface TrackingTimelineProps {
+  order: Order;
+}
 
-const ProfessionalTracking = () => {
+const ProfessionalTracking = ({ order }: TrackingTimelineProps) => {
+  const orderStatus = order.order_status;
+  const isDelivered = orderStatus === "Delivered";
+  const isShipped = orderStatus === "Shipped";
+  const isProcessing = orderStatus === "Processing";
+  const isPending = orderStatus === "Pending";
+
+  const timelineData = [
+    {
+      status: isDelivered ? "completed" : "pending",
+      title: "Pesanan Diterima",
+      description: "Pesanan telah sukses diterima oleh pelanggan.",
+      date: isDelivered ? formatDate(order.updated_at) : "-",
+      time: "-",
+    },
+    {
+      status: isDelivered ? "completed" : isShipped ? "active" : "pending",
+      title: "Dalam Pengiriman",
+      description: order.Shipping?.tracking_number 
+        ? `Pesanan sedang dikirim oleh kurir dengan nomor resi ${order.Shipping.tracking_number}.`
+        : "Pesanan telah diserahkan kepada kurir dan sedang dalam perjalanan.",
+      date: (isDelivered || isShipped) ? formatDate(order.updated_at) : "-",
+      time: "-",
+    },
+    {
+      status: (isDelivered || isShipped) ? "completed" : isProcessing ? "active" : "pending",
+      title: "Pesanan Diproses",
+      description: "Penjual sedang menyiapkan dan mengemas pesanan Anda.",
+      date: (isDelivered || isShipped || isProcessing) ? formatDate(order.updated_at) : "-",
+      time: "-",
+    },
+    {
+      status: (isDelivered || isShipped || isProcessing) ? "completed" : "active",
+      title: "Pesanan Dibuat",
+      description: "Pesanan berhasil dibuat dan menunggu konfirmasi.",
+      date: formatDate(order.created_at),
+      time: "-",
+    },
+  ];
+
+  const handleCopyResi = () => {
+    if (order.Shipping?.tracking_number) {
+      navigator.clipboard.writeText(order.Shipping.tracking_number);
+      toast.success("Nomor resi berhasil disalin!");
+    }
+  };
+
+  const shippingCarrier = order.Shipping?.shipping_method || "Regular Courier";
+  const trackingNo = order.Shipping?.tracking_number || "Belum ada resi";
+
   return (
     <div className="max-w-2xl mx-auto rounded-2xl bg-white p-6 md:p-8 shadow-[0_2px_20px_-4px_rgba(0,0,0,0.05)] border border-gray-100 font-sans">
 
@@ -49,17 +67,22 @@ const ProfessionalTracking = () => {
             <Package size={24} strokeWidth={1.5} />
           </div>
           <div>
-            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-0.5">
-              JNE Reguler
+            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-0.5 animate-pulse">
+              {shippingCarrier}
             </p>
             <p className="text-lg font-bold text-gray-900 tracking-tight leading-none">
-              JNE1234567890
+              {trackingNo}
             </p>
           </div>
         </div>
-        <button className="flex items-center justify-center gap-2 rounded-lg bg-gray-50 hover:bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700 transition-colors border border-gray-200">
-          <Copy size={16} /> Salin Resi
-        </button>
+        {order.Shipping?.tracking_number && (
+          <button 
+            onClick={handleCopyResi}
+            className="flex items-center justify-center gap-2 rounded-lg bg-gray-50 hover:bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700 transition-colors border border-gray-200"
+          >
+            <Copy size={16} /> Salin Resi
+          </button>
+        )}
       </div>
 
       <div className="px-2">
@@ -75,7 +98,7 @@ const ProfessionalTracking = () => {
 
               <div className="w-16 md:w-24 pt-0.5 shrink-0 text-right hidden sm:block">
                 <div className={`text-sm font-bold ${isActive ? 'text-blue-600' : 'text-gray-900'}`}>
-                  {item.time}
+                  {item.time !== "-" ? item.time : ""}
                 </div>
                 <div className="text-xs text-gray-500 mt-0.5">{item.date}</div>
               </div>
@@ -101,7 +124,7 @@ const ProfessionalTracking = () => {
 
               <div className="flex-1 pb-8 pt-0">
                 <div className="sm:hidden text-xs font-semibold text-gray-500 mb-1">
-                  {item.date !== "-" ? `${item.date} • ${item.time}` : "Estimasi Waktu"}
+                  {item.date !== "-" ? item.date : "Estimasi Waktu"}
                 </div>
                 
                 <h3 

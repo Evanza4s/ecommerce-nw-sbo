@@ -1,40 +1,52 @@
 import React from "react";
+import type { Order } from "@/server/modules/orders/types";
+import { formatCurrency } from "@/lib/admin";
+import ProductOrderItem from "@/components/product/ProductOrderItem";
+import { PriceSummary } from "@/components/ui/PriceSummary";
 
-const RefundSummary = () => {
+interface RefundSummaryProps {
+  order: Order;
+}
+
+const RefundSummary = ({ order }: RefundSummaryProps) => {
+  const firstItem = order.Items?.[0];
+  const variant = firstItem?.ProductVariantRef;
+  const product = variant?.ProductRef;
+
+  const productName = product?.product_name || "NWV Premium Product";
+  const variantText = [
+    variant?.color,
+    variant?.size
+  ].filter(Boolean).join(" • ") || "Default";
+
+  const priceText = firstItem ? formatCurrency(firstItem.price) : "-";
+  const imageSrc = variant?.variant_image || product?.thumbnail_url || "https://placehold.co/100x100?text=NWV";
+
+  const rows = [
+    { label: "Nomor Order", value: order.order_number },
+    { label: "Total Pembayaran", value: formatCurrency(order.grand_total) }
+  ];
+
   return (
-    <div className="rounded-2xl bg-white p-6 shadow-md">
-      <h2 className="mb-4 text-xl font-bold">Order Summary</h2>
-
-      <div className="mb-4 rounded-xl border p-4">
-        <div className="flex gap-3">
-          <div className="h-20 w-20 rounded-xl bg-dark/10" />
-
-          <div>
-            <h3 className="font-semibold">NWV Essential Hoodie</h3>
-
-            <p className="text-sm text-dark/60">Black • XL</p>
-
-            <p className="mt-2 font-bold text-primary">Rp 300.000</p>
-          </div>
-        </div>
+    <div className="flex flex-col gap-6">
+      <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200">
+        <h3 className="mb-4 text-xl font-bold">Produk yang Diajukan</h3>
+        <ProductOrderItem 
+          imageSrc={imageSrc}
+          title={productName}
+          variant={variantText}
+          qty={firstItem?.quantity || 1}
+          price={priceText}
+          totalPrice={firstItem ? formatCurrency(firstItem.subtotal) : "-"}
+        />
       </div>
 
-      <div className="space-y-2">
-        <div className="flex justify-between">
-          <span>Order ID</span>
-          <span>ABC-123456</span>
-        </div>
-
-        <div className="flex justify-between">
-          <span>Total Payment</span>
-          <span>Rp 300.000</span>
-        </div>
-
-        <div className="flex justify-between">
-          <span>Refund Amount</span>
-          <span className="font-bold text-green-600">Rp 300.000</span>
-        </div>
-      </div>
+      <PriceSummary 
+        title="Rincian Refund" 
+        rows={rows} 
+        total={formatCurrency(order.grand_total)}
+        className="shadow-sm border border-slate-200"
+      />
     </div>
   );
 };

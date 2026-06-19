@@ -15,6 +15,7 @@ import {
   Shield,
   UserCog,
   Settings,
+  HelpCircle,
 } from "lucide-react";
 
 import {
@@ -92,13 +93,16 @@ const systemItems = [
     icon: Shield,
   },
   {
-    title: "Settings",
-    url: "/admin/settings",
-    icon: Settings,
+    title: "FAQ",
+    url: "/admin/faq",
+    icon: HelpCircle,
   },
 ];
 
+import { useAuth } from "@/hooks/useAuth";
+
 const AdminSidebar = () => {
+  const { user } = useAuth();
   const pathname = usePathname();
   const isMenuActive = (url: string) =>
     pathname === url || pathname.startsWith(`${url}/`);
@@ -109,7 +113,7 @@ const AdminSidebar = () => {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/">
+              <Link href="/admin">
                 <Image
                   src={Logo}
                   alt="logo"
@@ -190,12 +194,14 @@ const AdminSidebar = () => {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg">
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary/20 text-primary" />
+            <SidebarMenuButton size="lg" className="border">
+              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary/20 text-primary">
+                {user?.username?.[0]?.toUpperCase() || 'A'}
+              </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">Admin User</span>
+                <span className="truncate font-medium">{user?.username || 'Admin User'}</span>
                 <span className="truncate text-xs text-muted-foreground">
-                  admin@nwv.com
+                  {user?.email || 'admin@nwv.com'}
                 </span>
               </div>
             </SidebarMenuButton>

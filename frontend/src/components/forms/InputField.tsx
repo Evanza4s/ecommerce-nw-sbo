@@ -2,22 +2,26 @@
 
 import { cn } from "@/lib/utils";
 import { Eye, EyeOff } from "lucide-react";
-import { useState, InputHTMLAttributes } from "react";
+import { useState, InputHTMLAttributes, forwardRef } from "react";
 
 interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
-  name: string;
+  name?: string;
+  error?: string;
+  hint?: string;
 }
 
-const InputField = ({
+const InputField = forwardRef<HTMLInputElement, InputFieldProps>(({
   label,
   type = "text",
   name,
   className,
   required,
   disabled,
+  error,
+  hint,
   ...props
-}: InputFieldProps) => {
+}, ref) => {
   const [showPassword, setShowPassword] = useState(false);
   const isPassword = type === "password";
 
@@ -35,15 +39,21 @@ const InputField = ({
 
       <div className="relative">
         <input
+          ref={ref}
           id={name}
           name={name}
           type={isPassword ? (showPassword ? "text" : "password") : type}
           required={required}
           disabled={disabled}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${name}-error` : hint ? `${name}-hint` : undefined}
           className={cn(
-            "w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm transition-colors duration-200",
+            "w-full rounded-lg border bg-white px-4 py-2.5 text-sm transition-colors duration-200",
             "placeholder:text-slate-400",
-            "focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20",
+            "focus:outline-none focus:ring-2",
+            error
+              ? "border-red-400 focus:border-red-400 focus:ring-red-200"
+              : "border-slate-300 focus:border-primary focus:ring-primary/20",
             "disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-500",
             isPassword ? "pr-12" : "pr-4"
           )}
@@ -62,8 +72,19 @@ const InputField = ({
           </button>
         )}
       </div>
+
+      {error && (
+        <p id={`${name}-error`} className="text-xs text-red-500 mt-0.5" role="alert">
+          {error}
+        </p>
+      )}
+      {!error && hint && (
+        <p id={`${name}-hint`} className="text-xs text-slate-400 mt-0.5">
+          {hint}
+        </p>
+      )}
     </div>
   );
-};
+});
 
 export default InputField;

@@ -1,13 +1,11 @@
+"use client"
 import AdminBreadcrumbs from "@/components/admin/AdminBreadcrumbs";
 import AdminCategoryForm from "@/components/admin/AdminCategoryForm";
 import AdminPageSection from "@/components/ui/AdminPageSection";
 
-const EditCategoriesPage = () => {
+const EditCategoryPage = ({ params }: { params: { id: string } }) => {
   return (
-    <AdminPageSection
-      title="Edit Category"
-      description="Perbarui kategori agar katalog tetap terstruktur dan akurat."
-    >
+    <AdminPageSection title="Edit Category" description="Perbarui detail kategori.">
       <AdminBreadcrumbs
         items={[
           { label: "Dashboard", href: "/admin" },
@@ -15,13 +13,9 @@ const EditCategoriesPage = () => {
           { label: "Edit" },
         ]}
       />
-      <AdminCategoryForm
-        title="Edit Category"
-        submitLabel="Update Category"
-        initialValues={{ name: "Sport", slug: "sport", status: "active" }}
-      />
+      <AdminCategoryForm mode="edit" categoryId={params.id} />
     </AdminPageSection>
   );
 };
 
-export default EditCategoriesPage;
+export default EditCategoryPage;

@@ -12,6 +12,8 @@ import { MoreHorizontal } from "lucide-react";
 export interface AdminRowActionItem {
   label: string;
   href?: string;
+  onClick?: () => void;
+  className?: string;
 }
 
 interface AdminRowActionsProps {
@@ -29,7 +31,12 @@ const AdminRowActions = ({ actions }: AdminRowActionsProps) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-44">
         {actions.map((action) => (
-          <DropdownMenuItem key={action.label} asChild={Boolean(action.href)}>
+          <DropdownMenuItem 
+            key={action.label} 
+            asChild={Boolean(action.href)}
+            onClick={action.onClick}
+            className={action.className}
+          >
             {action.href ? (
               <Link href={action.href}>{action.label}</Link>
             ) : (

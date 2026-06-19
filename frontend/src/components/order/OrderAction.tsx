@@ -7,13 +7,6 @@ const OrderAction = () => {
       <h2 className="mb-4 text-xl font-bold">Actions</h2>
 
       <div className="space-y-3">
-        <Button
-          variant="outline"
-          className="w-full text-dark hover:border-dark"
-        >
-          Write Review
-        </Button>
-
         <Button variant="secondary" className="w-full">
           Buy Again
         </Button>

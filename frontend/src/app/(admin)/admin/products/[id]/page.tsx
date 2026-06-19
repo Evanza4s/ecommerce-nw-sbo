@@ -4,25 +4,46 @@ import AdminBreadcrumbs from "@/components/admin/AdminBreadcrumbs";
 import AdminPanelCard from "@/components/admin/AdminPanelCard";
 import AdminPageSection from "@/components/ui/AdminPageSection";
 import ProductSpecification from "@/page/ProductDetail/ProductSpesification";
-import Image from "next/image";
+import ProductGallery from "@/components/product/ProductGallery";
+import { useAdminProductDetail } from "@/hooks/useAdminProducts";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
-const productData = {
-  id: "1",
-  title: "Nike Air Force 1 '07",
-  price: "Rp 1.549.000",
-  description:
-    "The radiance lives on in the Nike Air Force 1 '07, the b-ball icon that puts a fresh spin on what you know best: crisp leather, bold colours and the perfect amount of flash to make you shine.",
-  sizes: ["39", "40", "41", "42", "43", "44"],
-  colors: ["#ffffff", "#000000", "#e5e5e5"],
-  images: [
-    "/products/af1-main.jpg", // Pastikan ada gambar dummy di folder public
-    "/products/af1-side.jpg",
-    "/products/af1-back.jpg",
-    "/products/af1-top.jpg",
-  ],
-};
+const ViewProductPage = ({ params }: { params: { id: string } }) => {
+  const { product, isLoading, error } = useAdminProductDetail(params.id);
 
-const ViewProductPage = () => {
+  if (isLoading) {
+    return (
+      <AdminPageSection title="Product Detail" description="Memuat data produk...">
+        <div className="flex h-64 items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        </div>
+      </AdminPageSection>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <AdminPageSection title="Product Detail" description="Terjadi kesalahan">
+        <AdminPanelCard>
+          <div className="py-12 text-center text-red-500">{error || "Produk tidak ditemukan"}</div>
+        </AdminPanelCard>
+      </AdminPageSection>
+    );
+  }
+
+  const images = [...(product.images || [])].sort((a, b) => a.sort_order - b.sort_order);
+
+  if (images.length === 0 && product.thumbnail_url) {
+    images.push({
+      id: "thumb",
+      product_id: product.id,
+      image_url: product.thumbnail_url,
+      is_thumbnail: true,
+      sort_order: 0
+    });
+  }
+
   return (
     <AdminPageSection
       title="Product Detail"
@@ -32,55 +53,26 @@ const ViewProductPage = () => {
         items={[
           { label: "Dashboard", href: "/admin" },
           { label: "Products", href: "/admin/products" },
-          { label: productData.title },
+          { label: product.product_name },
         ]}
       />
 
       <AdminPanelCard>
+        <div className="mb-6 flex justify-end">
+          <Button asChild>
+            <Link href={`/admin/products/${product.id}/edit`}>Edit Produk</Link>
+          </Button>
+        </div>
         <div className="grid gap-12 lg:grid-cols-2">
           <div className="flex flex-col gap-4">
-            <div className="relative aspect-square w-full overflow-hidden rounded-3xl bg-slate-100">
-              <Image
-                src={productData.images[0]}
-                alt={productData.title}
-                fill
-                className="object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = "https://placehold.co/800x800?text=Product+Image";
-                }}
-              />
-            </div>
-            <div className="grid grid-cols-4 gap-4">
-              {productData.images.map((img, idx) => (
-                <button
-                  key={idx}
-                  className="relative aspect-square w-full overflow-hidden rounded-2xl bg-slate-100 border-2 border-transparent hover:border-primary transition-colors focus:border-primary focus:outline-none"
-                >
-                  <Image
-                    src={img}
-                    alt={`${productData.title} ${idx + 1}`}
-                    fill
-                    className="object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = "https://placehold.co/200x200?text=Thumb";
-                    }}
-                  />
-                </button>
-              ))}
-            </div>
+            <ProductGallery images={images} />
           </div>
           <div className="py-2">
-            <ProductInfo
-              title={productData.title}
-              price={productData.price}
-              description={productData.description}
-              sizes={productData.sizes}
-              colors={productData.colors}
-            />
+            <ProductInfo product={product} />
           </div>
         </div>
         <div className="mt-16 border-t border-slate-200 pt-16">
-          <ProductSpecification />
+          <ProductSpecification product={product} />
         </div>
       </AdminPanelCard>
     </AdminPageSection>
